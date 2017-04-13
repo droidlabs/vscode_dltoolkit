@@ -2,7 +2,7 @@
     "name": "droidlabs-toolkit",
     "displayName": "DroidLabs Toolkit",
     "description": "",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "publisher": "vocrsz",
     "engines": {
         "vscode": "^1.10.0"
@@ -20,6 +20,10 @@
     },
     "capabilities" : {
         "definitionProvider" : "true"
+    },
+    "dependencies": {
+		"lodash": "^4.17.3",
+		"minimatch": "^3.0.3"
     },
     "devDependencies": {
         "typescript": "^2.0.3",
