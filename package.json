@@ -2,7 +2,7 @@
     "name": "droidlabs-toolkit",
     "displayName": "DroidLabs Toolkit",
     "description": "",
-    "version": "0.0.2",
+    "version": "0.0.4",
     "publisher": "vocrsz",
     "engines": {
         "vscode": "^1.10.0"
@@ -23,7 +23,8 @@
     },
     "dependencies": {
 		"lodash": "^4.17.3",
-		"minimatch": "^3.0.3"
+		"minimatch": "^3.0.3",
+        "mkdirp": "*"
     },
     "devDependencies": {
         "typescript": "^2.0.3",
@@ -44,5 +45,20 @@
                 }
             }
         }
+    },
+    "contributes": {
+        "commands": [
+            {
+                "command": "extension.showSpec",
+                "title": "Files: Show Spec File"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "extension.showSpec",
+                "key": "alt+ctrl+r",
+                "mac": "alt+cmd+r"
+            }
+        ]
     }
 }
