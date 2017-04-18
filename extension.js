@@ -36,6 +36,23 @@ function activate(context) {
 
     context.subscriptions.push(vscode.languages.registerDefinitionProvider(['ruby'], beanProvider));
 
+    var onSave = vscode.workspace.onDidSaveTextDocument((document) => {
+        let checkBeansData = CheckEmptyInject(document.getText());
+        
+        if (checkBeansData.duplicatedBeans.length > 0) {
+            vscode.window.showWarningMessage(
+                "Duplicate dependency declarations found: " + checkBeansData.duplicatedBeans.join(", ")
+            );
+        }
+
+        if (checkBeansData.unusedBeans.length > 0) {
+            vscode.window.showWarningMessage(
+                "Unused dependency declarations found: " + checkBeansData.unusedBeans.join(", ")
+            );
+        }
+    });
+    context.subscriptions.push(onSave);
+
     let checkEmptyInjectCommand = vscode.commands.registerCommand('extension.checkEmptyInject', () => {
         if (!vscode.window.activeTextEditor) {
             vscode.window.showErrorMessage('No opened files to find empty beans');
@@ -43,9 +60,21 @@ function activate(context) {
         }
 
         let checkBeansData = CheckEmptyInject(vscode.window.activeTextEditor.document.getText());
+                
+        if (checkBeansData.duplicatedBeans.length > 0) {
+            vscode.window.showWarningMessage(
+                "Duplicate dependency declarations found: " + checkBeansData.duplicatedBeans.join(", ")
+            );
+        }
+
+        if (checkBeansData.unusedBeans.length > 0) {
+            vscode.window.showWarningMessage(
+                "Unused dependency declarations found: " + checkBeansData.unusedBeans.join(", ")
+            );
+        }
         
         vscode.window.showQuickPick(['Yes', 'No'], { 
-            placeHolder: 'Delete duplicated and empty BEANS'
+            placeHolder: 'Do you want to delete duplicate dependency declarations and unused dependencies?'
         }).then((selection) => { 
             if (selection == 'Yes') {
                 checkBeansData.stringsToDelete.forEach((stringToDelete) => {
@@ -79,11 +108,11 @@ function activate(context) {
             let packageFolder   = currentFileName.split('/spec/')[0]
             let fullClassFile   = currentFileName.replace('spec/', 'package/').replace('_spec.rb', '.rb');
             let classFile       = path.basename(fullClassFile);
+            let alternateClassFile = fullClassFile.split('/').slice(-2,-1) + '.rb'
 
             let filesList           = getFilesListForDirectory(packageFolder);
-            let existingClassFile   = filesList.filter((item) => {
-                return path.basename(item) == classFile;
-            })[0];
+            let existingClassFile   = filesList.filter((item) => { return path.basename(item) == classFile; })[0] || 
+                                      filesList.filter((item) => { return path.basename(item) == alternateClassFile; })[0];
 
             if (existingClassFile) {
                 vscode.workspace.openTextDocument(existingClassFile).then((textDocument) => {

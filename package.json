@@ -2,7 +2,7 @@
     "name": "droidlabs-toolkit",
     "displayName": "DroidLabs Toolkit",
     "description": "",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "publisher": "vocrsz",
     "engines": {
         "vscode": "^1.10.0"
@@ -62,11 +62,11 @@
             {
                 "command": "extension.showSpec",
                 "key": "alt+ctrl+r",
-                "mac": "alt+cmd+r"
+                "mac": "ctrl+cmd+r"
             },
             {
                 "command": "extension.checkEmptyInject",
-                "key": "alt+ctrl+e",
+                "key": "ctrl+alt+e",
                 "mac": "ctrl+cmd+e"
             }
         ]
