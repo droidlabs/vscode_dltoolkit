@@ -1,8 +1,11 @@
-const vscode    = require('vscode');
-const Locate    = require('./locate/locate');
-const fs        = require('fs');
-const path      = require('path');
-const mkdirp    = require('mkdirp');
+const vscode            = require('vscode');
+
+const Locate            = require('./locate/locate');
+const CheckEmptyInject  = require('./check_empty_inject/main');
+
+const fs                = require('fs');
+const path              = require('path');
+const mkdirp            = require('mkdirp');
 
 function activate(context) {
     if (!vscode.workspace.rootPath) return;
@@ -11,16 +14,64 @@ function activate(context) {
     let locate = new Locate(vscode.workspace.rootPath, settings);
     const beanProvider = {
         provideDefinition: (doc, pos) => {
-            const txt = doc.getText(doc.getWordRangeAtPosition(pos));
-            const matches = locate.find(txt);
+            let bean = doc.getText(doc.getWordRangeAtPosition(pos));
+            bean = getBeanRefirement(doc, bean);
+            const matches = locate.find(bean);
             return matches.map(m => new vscode.Location(vscode.Uri.file(m.file), new vscode.Position(m.line, m.char)));
         }
     };
 
+    function getBeanRefirement(document, beanName) {
+        let injectDefinitionRegex = new RegExp("inject\\s+:"+ beanName +",\\s+ref:\\s+:(\\w+)", "i");
+        
+        for (let i=0;i<document.lineCount;i++) {
+            let line = document.lineAt(i).text;
+            if (injectDefinitionRegex.test(line)) {
+                return line.match(injectDefinitionRegex)[1]
+            }
+        }
+
+        return beanName;
+    }
+
     context.subscriptions.push(vscode.languages.registerDefinitionProvider(['ruby'], beanProvider));
+
+    let checkEmptyInjectCommand = vscode.commands.registerCommand('extension.checkEmptyInject', () => {
+        if (!vscode.window.activeTextEditor) {
+            vscode.window.showErrorMessage('No opened files to find empty beans');
+            return; 
+        }
+
+        let checkBeansData = CheckEmptyInject(vscode.window.activeTextEditor.document.getText());
+        
+        vscode.window.showQuickPick(['Yes', 'No'], { 
+            placeHolder: 'Delete duplicated and empty BEANS'
+        }).then((selection) => { 
+            if (selection == 'Yes') {
+                checkBeansData.stringsToDelete.forEach((stringToDelete) => {
+                    let edits = [];
+                    edits.push(
+                        vscode.TextEdit.delete({
+                            start:  { line: +stringToDelete, character: 0 },
+                            end:    { line: +stringToDelete+1, character: 0 }
+                        })
+                    );
+                    let edit = new vscode.WorkspaceEdit();
+                    edit.set(vscode.window.activeTextEditor.document.uri, edits);
+                    vscode.workspace.applyEdit(edit);
+                });
+            }
+         })
+    });
+    context.subscriptions.push(checkEmptyInjectCommand);
     
     /// New Feature for specs
-    var disposable = vscode.commands.registerCommand('extension.showSpec', () => {
+    let showSpecCommand = vscode.commands.registerCommand('extension.showSpec', () => {
+        if (!vscode.window.activeTextEditor) {
+            vscode.window.showErrorMessage('No opened files to find specs');
+            return; 
+        }
+
         const DOCUMENT          = vscode.window.activeTextEditor.document
         const currentFileName   = DOCUMENT.fileName
 
@@ -93,7 +144,7 @@ end`)
             return;
         }
     });
-    context.subscriptions.push(disposable);
+    context.subscriptions.push(showSpecCommand);
     
 }
 exports.activate = activate;

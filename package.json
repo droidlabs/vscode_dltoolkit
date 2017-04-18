@@ -2,7 +2,7 @@
     "name": "droidlabs-toolkit",
     "displayName": "DroidLabs Toolkit",
     "description": "",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "publisher": "vocrsz",
     "engines": {
         "vscode": "^1.10.0"
@@ -24,7 +24,8 @@
     "dependencies": {
 		"lodash": "^4.17.3",
 		"minimatch": "^3.0.3",
-        "mkdirp": "*"
+        "mkdirp": "*",
+        "object.values": "*"
     },
     "devDependencies": {
         "typescript": "^2.0.3",
@@ -51,6 +52,10 @@
             {
                 "command": "extension.showSpec",
                 "title": "Files: Show Spec File"
+            },
+            {
+                "command": "extension.checkEmptyInject",
+                "title": "Files: Check Empty Inject"
             }
         ],
         "keybindings": [
@@ -58,6 +63,11 @@
                 "command": "extension.showSpec",
                 "key": "alt+ctrl+r",
                 "mac": "alt+cmd+r"
+            },
+            {
+                "command": "extension.checkEmptyInject",
+                "key": "alt+ctrl+e",
+                "mac": "ctrl+cmd+e"
             }
         ]
     }

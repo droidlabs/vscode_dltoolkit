@@ -1,6 +1,5 @@
 'use strict';
 
-
 const positionalise = require('./lib/positionalise'),
     parser = require('./lib/parse'),
     fs = require('fs');
