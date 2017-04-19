@@ -117,20 +117,33 @@ function activate(context) {
             let fullSpecFile    = currentFileName.replace('package/', 'spec/').replace('.rb', '_spec.rb');
             let packageSpecFile = currentFileName.split('/package/')[1]
             let specFile        = path.basename(fullSpecFile);
+            let specFolder      = specFile.replace('_spec.rb', '');
 
             let className       = getClassName(DOCUMENT) || classify(packageSpecFile)
 
-            let filesList           = getFilesListForDirectory(packageFolder);
-            let existingSpecFile    = filesList.filter((item) => {
-                return path.basename(item) == specFile;
-            })[0];
-
-            if (existingSpecFile) {
-                vscode.workspace.openTextDocument(existingSpecFile).then((textDocument) => {
-                  vscode.window.showTextDocument(textDocument);
+            let filesList         = getFilesListForDirectory(packageFolder);
+            let existingSpecFile  = filesList.filter((item) => { return path.basename(item) == specFile; })
+            if (!existingSpecFile.length) {
+                existingSpecFile = filesList.filter((item) => { 
+                    return item.split('/').slice(-2, -1) == specFolder; 
                 });
+            }      
 
-            } else {
+            if (existingSpecFile.length == 1) {
+                vscode.workspace.openTextDocument(existingSpecFile[0]).then((textDocument) => {
+                    vscode.window.showTextDocument(textDocument);
+                });
+            } else if (existingSpecFile.length > 1) {
+                let specNames = existingSpecFile.map((item) => path.basename(item));
+                vscode.window.showQuickPick(specNames, { 
+                    placeHolder: 'Pick rspec file to show:'
+                }).then((selection) => {
+                    let pickedFile = existingSpecFile.filter((item) => {return path.basename(item) == selection;})[0];
+                    vscode.workspace.openTextDocument(pickedFile).then((textDocument) => {
+                        vscode.window.showTextDocument(textDocument);
+                    });
+                });
+            } else if (existingSpecFile.length == 0) {
                 let specDirname     = path.dirname(fullSpecFile);
                 vscode.window.showQuickPick(['Yes', 'No'], { 
                     placeHolder: 'Rspec file for this class does not exist. Create one?'
