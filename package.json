@@ -2,11 +2,19 @@
     "name": "droidlabs-toolkit",
     "displayName": "DroidLabs Toolkit",
     "description": "",
-    "version": "0.0.8",
+    "version": "0.0.9",
+    "icon": "images/droidlabs.jpg",
     "publisher": "vocrsz",
     "engines": {
         "vscode": "^1.10.0"
     },
+    "contributors": [{
+		"name": "vocrsz",
+		"url": "https://github.com/vocrsz"
+	},{
+		"name": "rousgg",
+		"url": "https://github.com/rous-gg"
+    }],
     "categories": [
         "Other"
     ],
