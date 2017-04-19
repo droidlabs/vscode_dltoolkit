@@ -138,6 +138,7 @@ function activate(context) {
                 vscode.window.showQuickPick(specNames, { 
                     placeHolder: 'Pick rspec file to show:'
                 }).then((selection) => {
+                    if (!selection) return;
                     let pickedFile = existingSpecFile.filter((item) => {return path.basename(item) == selection;})[0];
                     vscode.workspace.openTextDocument(pickedFile).then((textDocument) => {
                         vscode.window.showTextDocument(textDocument);
@@ -164,6 +165,8 @@ end`)
                         vscode.workspace.openTextDocument(fullSpecFile).then((textDocument) => {
                         vscode.window.showTextDocument(textDocument);
                         });
+                    } else {
+                        return;
                     }
                 });
                 
