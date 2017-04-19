@@ -2,6 +2,7 @@ const vscode            = require('vscode');
 
 const Locate            = require('./locate/locate');
 const CheckEmptyInject  = require('./check_empty_inject/main');
+const PackageParser     = require('./package_parser/main');
 
 const fs                = require('fs');
 const path              = require('path');
@@ -20,23 +21,26 @@ function activate(context) {
             return matches.map(m => new vscode.Location(vscode.Uri.file(m.file), new vscode.Position(m.line, m.char)));
         }
     };
-
-    function getBeanRefirement(document, beanName) {
-        let injectDefinitionRegex = new RegExp("inject\\s+:"+ beanName +",\\s+ref:\\s+:(\\w+)", "i");
-        
-        for (let i=0;i<document.lineCount;i++) {
-            let line = document.lineAt(i).text;
-            if (injectDefinitionRegex.test(line)) {
-                return line.match(injectDefinitionRegex)[1]
-            }
-        }
-
-        return beanName;
-    }
-
     context.subscriptions.push(vscode.languages.registerDefinitionProvider(['ruby'], beanProvider));
 
-    var onSave = vscode.workspace.onDidSaveTextDocument((document) => {
+    let goToPackageCommand = vscode.commands.registerCommand('extension.goToPackage', () => {
+        let packageFileContent  = fs.readFileSync(path.join(vscode.workspace.rootPath, 'Rdm.packages')).toString();
+        let packageList         = PackageParser(packageFileContent);
+        
+        vscode.window.showQuickPick(packageList, {
+            placeHolder: "Enter package name"
+        }).then((selection) => {
+            if (!selection) return;
+            let moduleName = 'package/' + selection.split('/').slice(-1) + '.rb';
+            let moduleFile = path.join(vscode.workspace.rootPath, selection, moduleName);
+            vscode.workspace.openTextDocument(moduleFile).then((textDocument) => {
+                vscode.window.showTextDocument(textDocument);
+            });
+        });
+    });
+    context.subscriptions.push(goToPackageCommand);
+
+    let onSave = vscode.workspace.onDidSaveTextDocument((document) => {
         let checkBeansData = CheckEmptyInject(document.getText());
         
         if (checkBeansData.duplicatedBeans.length > 0) {
@@ -231,5 +235,18 @@ function classify(snake_case) {
     });
 
     return capitalizeFirstLetter(result)
+}
+
+function getBeanRefirement(document, beanName) {
+    let injectDefinitionRegex = new RegExp("inject\\s+:"+ beanName +",\\s+ref:\\s+:(\\w+)", "i");
+    
+    for (let i=0;i<document.lineCount;i++) {
+        let line = document.lineAt(i).text;
+        if (injectDefinitionRegex.test(line)) {
+            return line.match(injectDefinitionRegex)[1]
+        }
+    }
+
+    return beanName;
 }
 

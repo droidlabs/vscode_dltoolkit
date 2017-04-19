@@ -13,7 +13,11 @@ Feature allows user to jump to class, where bean service was defined. This works
 Feature allows user to jump to rspec which describes current file. This works with 2 modes.
 **The first mode** works when name of current file is equal for it's rspec file (differences may include '_spec.rb' ending). If rspec file does not exist, UI gives you a choice to create new rspec file with default bootstrap.
 **The second mode** works when there are many rspec files for current document and they are grouped at common folder. This way plugin shows you a dropdown list with addresses of all rspec files
-**HOTKEY** - ctrl+cmd+r
+**HOTKEY** - ctrl+cmd+R
 ##### 3. Delete unused dependencies
 This feature allows user to parse current file and remove duplicated or unused dependecies. Also this works after save. If file include duplicated of unused injected beans plugin shows you warning with list of problem beans.
-**HOTKEY** - ctrl+cmd+e
+**HOTKEY** - ctrl+cmd+E
+##### 4. Goto Package folder
+Feature allows you to quick search and go to main package file (#{SOME_PACKAGE_FOLDER}/package/#{PACKAGE_NAME}.rb).
+To use it, press cmd+ctrl+P and pick package from selection list.
+**HOTKEY** - ctrl+cmd+P

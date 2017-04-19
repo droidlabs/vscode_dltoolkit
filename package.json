@@ -2,7 +2,7 @@
     "name": "droidlabs-toolkit",
     "displayName": "DroidLabs Toolkit",
     "description": "",
-    "version": "0.0.11",
+    "version": "0.0.12",
     "icon": "images/droidlabs.jpg",
     "publisher": "vocrsz",
     "engines": {
@@ -63,6 +63,10 @@
             {
                 "command": "extension.checkEmptyInject",
                 "title": "Files: Check Empty Inject"
+            },
+            {
+                "command": "extension.goToPackage",
+                "title": "Files: Go to RDM Package Folder"
             }
         ],
         "keybindings": [
@@ -75,6 +79,11 @@
                 "command": "extension.checkEmptyInject",
                 "key": "ctrl+alt+e",
                 "mac": "ctrl+cmd+e"
+            },
+            {
+                "command": "extension.goToPackage",
+                "key": "ctrl+alt+p",
+                "mac": "ctrl+cmd+p"
             }
         ]
     }
