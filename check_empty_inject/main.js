@@ -1,7 +1,5 @@
 'use strict';
 
-var values = require('object.values');
-
 module.exports = function checkEmptyInject(document) {
   let definedBeansWithString  = {};
   let usedBeans               = [];
@@ -12,51 +10,39 @@ module.exports = function checkEmptyInject(document) {
     if (INJECT_DEFINITION_REGEX.test(string)){
       let injectedBeanName  = string.match(INJECT_DEFINITION_REGEX)[1];
 
-      definedBeansWithString[lineNumber] = injectedBeanName;
+      definedBeansWithString[injectedBeanName] = definedBeansWithString[injectedBeanName] || [];
+      definedBeansWithString[injectedBeanName].push(lineNumber);
       return;
     }
 
-    values(definedBeansWithString).forEach((bean) => {
-      let injectUsage = new RegExp("\\W(" + bean + ").", "i");
+    for (let bean in definedBeansWithString) {
+      let injectUsage = new RegExp("[\\s|\\W]*(" + bean + ")[\\s|\\W]*", "i");
 
       if (injectUsage.test(string)) {
         usedBeans.push(string.match(injectUsage)[1]);
       }
-    });
+    }
   });
 
-  let duplicatedBeans = values(definedBeansWithString).filter((item, index, array) => {
-    return array.indexOf(item) != index;
-  });
+  let duplicatedBeans = [];
+  let unusedBeans     = [];
+  let stringsToDelete = [];
 
-  let unusedBeans = values(definedBeansWithString).filter((defBean) => {
-    return !~usedBeans.indexOf(defBean);
-  });
-
-  let stringsToDelete = []
-  duplicatedBeans.forEach((dupItem) => {
-    let line = -1;
-
-    for (let index in definedBeansWithString) {
-      if (definedBeansWithString[index] == dupItem) {
-        line = index > line ? index : line;
-      }
+  for (let bean in definedBeansWithString) {
+    if (!~usedBeans.indexOf(bean)) {
+      unusedBeans.push(bean);
+      
+      stringsToDelete = stringsToDelete.concat(definedBeansWithString[bean]);
     }
 
-    if (line > 0) stringsToDelete.push(line);
-  });
+    if (definedBeansWithString[bean].length > 1) {
+      duplicatedBeans.push(bean);
 
-  unusedBeans.forEach((dupItem) => {
-    let line = -1;
-
-    for (let index in definedBeansWithString) {
-      if (definedBeansWithString[index] == dupItem) {
-        line = index > line ? index : line;
-      }
+      stringsToDelete = stringsToDelete.concat(
+        definedBeansWithString[bean].sort().slice(1)
+      );
     }
-
-    if (line > 0) stringsToDelete.push(line);
-  });
+  }
 
   let uniqueStringsToDelete = stringsToDelete.filter((item, index, array) => { return array.indexOf(item) == index });
 

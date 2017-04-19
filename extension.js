@@ -60,35 +60,24 @@ function activate(context) {
         }
 
         let checkBeansData = CheckEmptyInject(vscode.window.activeTextEditor.document.getText());
-                
-        if (checkBeansData.duplicatedBeans.length > 0) {
-            vscode.window.showWarningMessage(
-                "Duplicate dependency declarations found: " + checkBeansData.duplicatedBeans.join(", ")
-            );
-        }
-
-        if (checkBeansData.unusedBeans.length > 0) {
-            vscode.window.showWarningMessage(
-                "Unused dependency declarations found: " + checkBeansData.unusedBeans.join(", ")
-            );
-        }
         
         vscode.window.showQuickPick(['Yes', 'No'], { 
             placeHolder: 'Do you want to delete duplicate dependency declarations and unused dependencies?'
         }).then((selection) => { 
             if (selection == 'Yes') {
+                let edits   = [];
+                let edit    = new vscode.WorkspaceEdit();
+                
                 checkBeansData.stringsToDelete.forEach((stringToDelete) => {
-                    let edits = [];
                     edits.push(
                         vscode.TextEdit.delete({
                             start:  { line: +stringToDelete, character: 0 },
                             end:    { line: +stringToDelete+1, character: 0 }
                         })
                     );
-                    let edit = new vscode.WorkspaceEdit();
-                    edit.set(vscode.window.activeTextEditor.document.uri, edits);
-                    vscode.workspace.applyEdit(edit);
                 });
+                edit.set(vscode.window.activeTextEditor.document.uri, edits);
+                vscode.workspace.applyEdit(edit);
             }
          })
     });
