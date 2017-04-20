@@ -36,6 +36,9 @@ function activate(context) {
                 let packageDirectory    = path.join(vscode.workspace.rootPath, selection);
                 let packageFilesList    = getFilesListForDirectory(packageDirectory).map((item) => {
                     return item.replace(packageDirectory, '');
+                }).filter((file) => {
+                    let hiddenFilesRegExp = new RegExp("^\.\\w+$", 'i');
+                    return !hiddenFilesRegExp.test(path.basename(file));
                 });
             
             
@@ -134,15 +137,16 @@ function activate(context) {
             return;
         } else if (~currentFileName.indexOf('package/')) {
             let packageFolder   = currentFileName.split('/package/')[0]
-            let fullSpecFile    = currentFileName.replace('package/', 'spec/').replace('.rb', '_spec.rb');
+            let fullSpecFile    = currentFileName.replace(/package\/\w+\//i, 'spec/').replace('.rb', '_spec.rb');
             let packageSpecFile = currentFileName.split('/package/')[1]
             let specFile        = path.basename(fullSpecFile);
             let specFolder      = specFile.replace('_spec.rb', '');
 
             let className       = getClassName(DOCUMENT) || classify(packageSpecFile)
 
-            let filesList         = getFilesListForDirectory(packageFolder);
-            let existingSpecFile  = filesList.filter((item) => { return path.basename(item) == specFile; })
+            let filesList         = getFilesListForDirectory(path.join(packageFolder, '/spec'));
+            let existingSpecFile  = filesList.filter((item) => { return fullSpecFile == item; });
+            
             if (!existingSpecFile.length) {
                 existingSpecFile = filesList.filter((item) => { 
                     return item.split('/').slice(-2, -1) == specFolder; 
@@ -154,12 +158,13 @@ function activate(context) {
                     vscode.window.showTextDocument(textDocument);
                 });
             } else if (existingSpecFile.length > 1) {
-                let specNames = existingSpecFile.map((item) => path.basename(item));
+                let specNames = existingSpecFile.map((item) => item.replace(packageFolder, ''));
                 vscode.window.showQuickPick(specNames, { 
                     placeHolder: 'Pick rspec file to show:'
                 }).then((selection) => {
                     if (!selection) return;
-                    let pickedFile = existingSpecFile.filter((item) => {return path.basename(item) == selection;})[0];
+                    let pickedFile = path.join(packageFolder, selection);
+
                     vscode.workspace.openTextDocument(pickedFile).then((textDocument) => {
                         vscode.window.showTextDocument(textDocument);
                     });
