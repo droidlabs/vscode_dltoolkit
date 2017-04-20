@@ -31,10 +31,25 @@ function activate(context) {
             placeHolder: "Enter package name"
         }).then((selection) => {
             if (!selection) return;
-            let moduleName = 'package/' + selection.split('/').slice(-1) + '.rb';
-            let moduleFile = path.join(vscode.workspace.rootPath, selection, moduleName);
+
+            let moduleName          = 'package/' + selection.split('/').slice(-1) + '.rb';
+            let packageDirectory    = path.join(vscode.workspace.rootPath, selection);
+            let moduleFile          = path.join(vscode.workspace.rootPath, selection, moduleName);
+            let packageFilesList    = getFilesListForDirectory(packageDirectory).map((item) => {
+                return item.replace(packageDirectory, '');
+            });
+
             vscode.workspace.openTextDocument(moduleFile).then((textDocument) => {
                 vscode.window.showTextDocument(textDocument);
+            });
+
+            vscode.window.showQuickPick(packageFilesList, {
+                placeHolder: "Enter file name"
+            }).then((pickedFile) => {
+                let fullPickedFile = path.join(packageDirectory, pickedFile);
+                vscode.workspace.openTextDocument(fullPickedFile).then((textDocument) => {
+                    vscode.window.showTextDocument(textDocument);
+                });
             });
         });
     });
