@@ -17,11 +17,39 @@ function activate(context) {
         provideDefinition: (doc, pos) => {
             let bean = doc.getText(doc.getWordRangeAtPosition(pos));
             bean = getBeanRefirement(doc, bean);
-            const matches = locate.find(bean);
+            const matches = locate.find(bean, ['bean']);
+
             return matches.map(m => new vscode.Location(vscode.Uri.file(m.file), new vscode.Position(m.line, m.char)));
         }
     };
     context.subscriptions.push(vscode.languages.registerDefinitionProvider(['ruby'], beanProvider));
+
+    let findBeanUsageCommand = vscode.commands.registerCommand('extension.findBeanUsage', () => {
+        let beanDefinitionRegexp = new RegExp("\\s*bean\\s+:(\\w+)", "i");
+        let fileContent = vscode.window.activeTextEditor.document.getText().split("\n");
+
+        let beanDefinition = fileContent.find((item) => {return beanDefinitionRegexp.test(item)});
+        if (!beanDefinition) return;
+
+        let beanName = beanDefinition.match(beanDefinitionRegexp)[1];
+        
+        let beanUsage = locate.find(beanName, ['inject']);
+
+        vscode.window.showQuickPick(beanUsage.map(item => item.containerBean || item.file), {
+            placeHolder: "Enter inject name:"
+        }).then((selection) => {
+            if (!selection) return;
+
+            let dependentFile = beanUsage.find((bean) => {
+                return bean.containerBean == selection || bean.file == selection
+            });
+
+            vscode.workspace.openTextDocument(dependentFile.file).then((textDocument) => {
+                vscode.window.showTextDocument(textDocument);
+            });
+        })
+    });
+    context.subscriptions.push(findBeanUsageCommand);
 
     let goToPackageCommand = vscode.commands.registerCommand('extension.goToPackage', () => {
         let packageFileContent  = fs.readFileSync(path.join(vscode.workspace.rootPath, 'Rdm.packages')).toString();
@@ -41,18 +69,15 @@ function activate(context) {
                     return !hiddenFilesRegExp.test(path.basename(file));
                 });
             
-            
                 vscode.window.showQuickPick(packageFilesList, {
                     placeHolder: "Enter file name:"
                 }).then((pickedFile) => {
-                    if (pickedFile) {
-                        let fullPickedFile = path.join(packageDirectory, pickedFile);
-                        vscode.workspace.openTextDocument(fullPickedFile).then((textDocument) => {
-                            vscode.window.showTextDocument(textDocument);
-                        });
-                    } else {
-                        showPackageDialog();
-                    }
+                    if (!pickedFile) showPackageDialog();
+
+                    let fullPickedFile = path.join(packageDirectory, pickedFile);
+                    vscode.workspace.openTextDocument(fullPickedFile).then((textDocument) => {
+                        vscode.window.showTextDocument(textDocument);
+                    });
                 });
             });
         })();

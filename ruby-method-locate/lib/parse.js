@@ -54,6 +54,43 @@ function NameList(buffer, os) {
     return names;
 }
 
+const _paramsDelimiter      = ',';
+const _methodAttributeRegex = new RegExp("^:(\\w+)$", "i");
+const _methodOptionsRegex   = new RegExp("^(\\w+):\\s+:(\\w+)$", "i");
+
+function ParamsList(buffer, os) {
+    let ch;
+    let start = os;
+    //find the line end, then
+    while ((ch = buffer[os]) && !~_eol.indexOf(ch) && ch !== '#') os++;
+
+    let end    = os;
+    let names  = [];
+    let attrs = {};
+
+    let lineContent = buffer.slice(start, end).split(_paramsDelimiter).map((item) => item.trim());
+    lineContent.forEach((item) => {
+        if (_methodAttributeRegex.test(item)) {
+            names.push(item.match(_methodAttributeRegex)[1]);
+            return
+        }
+
+        if (_methodOptionsRegex.test(item)) {
+            let key     = item.match(_methodOptionsRegex)[1];
+            let value   = item.match(_methodOptionsRegex)[2];
+
+            attrs[key] = value;
+            return;
+        }          
+    });
+
+    return {
+        names:  names,
+        attrs: attrs,
+        end:    end
+    };
+}
+
 function Include(entry, buffer, os) {
     os += entry.length;
     let names = NameList(buffer, os);
@@ -316,28 +353,45 @@ function Attr(entry, buffer, os) {
     };
 }
 
+function Inject(entry, buffer, os) {
+    if (entry !== 'inject') return {};
+
+    let injectDefinition = ParamsList(buffer, os + entry.length);
+
+    let beanName = injectDefinition.attrs.ref || injectDefinition.names[0];
+    let inject = {}
+    inject[beanName] = {
+        posn: os + entry.length
+    }
+
+    return {
+        inject,
+        end: injectDefinition.end
+    };
+}
+
 function Bean(entry, buffer, os) {
     os += entry.length;
     let names = NameList(buffer, os);
     names.length = 1;
-    let method = {};
+    let bean = {};
     if (entry === 'bean') {
-        method = names.reduce((t, n) => {
+        bean = names.reduce((t, n) => {
             t[n.slice(1)] = {
                 posn: os
             };
             return t;
-        }, method);
+        }, bean);
 
-        method = names.reduce((t, n) => {
-            t[n.slice(1) + '='] = {
-                posn: os
-            };
-            return t;
-        }, method);
+        // bean = names.reduce((t, n) => {
+        //     t[n.slice(1) + '='] = {
+        //         posn: os
+        //     };
+        //     return t;
+        // }, bean);
     }
     return {
-        method,
+        bean,
         end: names.end
     };
 }
@@ -407,7 +461,8 @@ const internalEntries = {
         'attr_writer': Attr,
         'attr_accessor': Attr,
         'alias_method': MethodAlias,
-        'bean': Bean
+        'bean': Bean,
+        'inject': Inject
     };
 
 const internal = new Entries(internalEntries);

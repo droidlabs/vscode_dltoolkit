@@ -2,7 +2,7 @@
     "name": "droidlabs-toolkit",
     "displayName": "DroidLabs Toolkit",
     "description": "",
-    "version": "0.0.17",
+    "version": "0.0.18",
     "icon": "images/droidlabs.jpg",
     "publisher": "vocrsz",
     "engines": {
@@ -67,6 +67,10 @@
             {
                 "command": "extension.goToPackage",
                 "title": "Files: Go to RDM Package Folder"
+            },
+            {
+                "command": "extension.findBeanUsage",
+                "title": "Files: Show bean usage"
             }
         ],
         "keybindings": [
@@ -84,6 +88,11 @@
                 "command": "extension.goToPackage",
                 "key": "ctrl+alt+p",
                 "mac": "ctrl+cmd+p"
+            },
+            {
+                "command": "extension.findBeanUsage",
+                "key": "ctrl+alt+i",
+                "mac": "ctrl+cmd+i"
             }
         ]
     }

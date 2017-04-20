@@ -5,9 +5,9 @@ const locator   = require('../ruby-method-locate/main'),
 	    path      = require('path'),
       _         = require('lodash');
 
-const DECLARATION_TYPES = ['class', 'module', 'method', 'classMethod'];
+const DECLARATION_TYPES = ['class', 'module', 'method', 'classMethod', 'bean', 'inject'];
 
-function flatten(locateInfo, file, containerName = '') {
+function flatten(locateInfo, file, containerName = '', containerBean) {
 	return _.flatMap(locateInfo, (symbols, type) => {
 		if (!_.includes(DECLARATION_TYPES, type)) {
 			// Skip top-level include or posn property etc.
@@ -21,12 +21,19 @@ function flatten(locateInfo, file, containerName = '') {
 				file: file,
 				line: posn.line,
 				char: posn.char,
-				containerName: containerName || ''
+				containerName: containerName || '',
+				containerBean: containerBean
 			};
 			_.extend(symbolInfo, _.omit(inner, DECLARATION_TYPES));
 			const sep = { method: '#', classMethod: '.' }[type] || '::';
 			const fullName = containerName ? `${containerName}${sep}${name}` : name;
-			return [symbolInfo].concat(flatten(inner, file, fullName));
+			
+			let parentBean;
+			if (inner.bean) {
+				parentBean = _.findKey(inner.bean, 'posn');
+			}
+
+			return [symbolInfo].concat(flatten(inner, file, fullName, parentBean));
 		});
 	});
 }
@@ -70,15 +77,17 @@ module.exports = class Locate {
 		const waitForParse = (absPath in this.tree) ? Promise.resolve() : this.parse(absPath);
 		return waitForParse.then(() => _.clone(this.tree[absPath] || []));
 	}
-	find(name) {
+	find(name, type) {
 		// because our word pattern is designed to match symbols
 		// things like Gem::RequestSet may request a search for ':RequestSet'
 		const escapedName = _.escapeRegExp(_.trimStart(name, ':'));
 		const regexp = new RegExp(`^${escapedName}=?\$`);
+		const allowedTypes = type || ['class', 'module', 'method', 'classMethod'];
+
 		return _(this.tree)
 			.values()
 			.flatten()
-      .filter(symbol => regexp.test(symbol.name))
+      .filter(symbol => { return regexp.test(symbol.name) && allowedTypes.includes(symbol.type) })
 			.map(_.clone)
 			.value();
 	}
