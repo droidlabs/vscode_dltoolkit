@@ -137,7 +137,7 @@ function activate(context) {
             return;
         } else if (~currentFileName.indexOf('package/')) {
             let packageFolder   = currentFileName.split('/package/')[0]
-            let fullSpecFile    = currentFileName.replace(/package\/\w+\//i, 'spec/').replace('.rb', '_spec.rb');
+            let fullSpecFile    = currentFileName.replace('package/', 'spec/').replace('.rb', '_spec.rb');
             let packageSpecFile = currentFileName.split('/package/')[1]
             let specFile        = path.basename(fullSpecFile);
             let specFolder      = specFile.replace('_spec.rb', '');
@@ -182,11 +182,11 @@ function activate(context) {
 `require 'spec_helper'
 
 describe ${className} do
-    before :all do
-    end
+  before :all do
+  end
 
-    it {
-    }
+  it {
+  }
 end`)
                         vscode.workspace.openTextDocument(fullSpecFile).then((textDocument) => {
                         vscode.window.showTextDocument(textDocument);
