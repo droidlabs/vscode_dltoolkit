@@ -179,9 +179,7 @@ function activate(context) {
                         mkdirp.sync(specDirname);
                 
                         fs.appendFile(fullSpecFile,
-`require 'spec_helper'
-
-describe ${className} do
+`describe ${className} do
   before :all do
   end
 
