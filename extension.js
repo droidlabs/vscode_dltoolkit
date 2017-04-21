@@ -90,6 +90,8 @@ function activate(context) {
     context.subscriptions.push(goToPackageCommand);
 
     let onSave = vscode.workspace.onDidSaveTextDocument((document) => {
+        let specRegExp = new RegExp(".*_spec.rb", "i");
+        if (specRegExp.test(document.uri)) return;
         let checkBeansData = CheckEmptyInject(document.getText());
         
         if (checkBeansData.duplicatedBeans.length > 0) {
