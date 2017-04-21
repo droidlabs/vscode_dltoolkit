@@ -1,9 +1,11 @@
 'use strict';
-const locator   = require('../ruby-method-locate/main'),
-	    minimatch = require('minimatch'),
-      fs        = require('fs'),
-	    path      = require('path'),
-      _         = require('lodash');
+const locator   		= require('../ruby-method-locate/main'),
+	    minimatch 		= require('minimatch'),
+      fs        		= require('fs'),
+	    path      		= require('path'),
+      _         		= require('lodash'),
+			PackageParser = require('../package_parser/main'),
+			vscode				= require('vscode');
 
 const DECLARATION_TYPES = ['class', 'module', 'method', 'classMethod', 'bean', 'inject'];
 
@@ -15,6 +17,8 @@ function flatten(locateInfo, file, containerName = '', containerBean) {
 		}
 		return _.flatMap(symbols, (inner, name) => {
 			const posn = inner.posn || { line: 0, char: 0 };
+			let packageName = getPackageList().find(pack => new RegExp(pack).test(file))
+			if (packageName) packageName = packageName.split('/').slice(-1);
 			const symbolInfo = {
 				name: name,
 				type: type,
@@ -22,7 +26,8 @@ function flatten(locateInfo, file, containerName = '', containerBean) {
 				line: posn.line,
 				char: posn.char,
 				containerName: containerName || '',
-				containerBean: containerBean
+				containerBean: containerBean,
+				package: packageName
 			};
 			_.extend(symbolInfo, _.omit(inner, DECLARATION_TYPES));
 			const sep = { method: '#', classMethod: '.' }[type] || '::';
@@ -61,6 +66,11 @@ function filter(symbols, query, matcher) {
 		.flatMap(regexp => symbols.filter(symbolInfo => matcher(symbolInfo, regexp)))
 		.uniq()
 		.value();
+}
+function getPackageList() {
+	const RDM_FILE = 'Rdm.packages';
+	let rdmPackages = path.join(vscode.workspace.rootPath, RDM_FILE);
+	return PackageParser(fs.readFileSync(rdmPackages).toString());
 }
 module.exports = class Locate {
 	constructor(root, settings) {

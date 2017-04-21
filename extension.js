@@ -34,14 +34,19 @@ function activate(context) {
         let beanName = beanDefinition.match(beanDefinitionRegexp)[1];
         
         let beanUsage = locate.find(beanName, ['inject']);
-
-        vscode.window.showQuickPick(beanUsage.map(item => item.containerBean || item.file), {
+        vscode.window.showQuickPick(beanUsage.map(item => {
+            // TODO: https://github.com/Microsoft/vscode/issues/8886 mark opened files at list
+            // let list = vscode.window.visibleTextEditors.map((item) => item.document.uri.path);
+            // let opened = list.includes(item.file) ? ': (opened)' : '';
+            return `${item.package}: ${item.containerBean}` || item.file;
+        }), {
             placeHolder: "Enter inject name:"
         }).then((selection) => {
             if (!selection) return;
 
             let dependentFile = beanUsage.find((bean) => {
-                return bean.containerBean == selection || bean.file == selection
+                let beanOfFileName = selection.split(' ')[1];
+                return bean.containerBean == beanOfFileName || bean.file == selection
             });
 
             vscode.workspace.openTextDocument(dependentFile.file).then((textDocument) => {

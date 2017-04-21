@@ -2,7 +2,7 @@
     "name": "droidlabs-toolkit",
     "displayName": "DroidLabs Toolkit",
     "description": "",
-    "version": "0.0.18",
+    "version": "0.0.19",
     "icon": "images/droidlabs.jpg",
     "publisher": "vocrsz",
     "engines": {
