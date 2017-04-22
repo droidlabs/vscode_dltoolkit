@@ -56,6 +56,21 @@ function activate(context) {
     });
     context.subscriptions.push(findBeanUsageCommand);
 
+    const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(getPackageName));
+    context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(getPackageName));
+    function getPackageName() {
+        let currentPackage = new PackageParser().getCurrentPackage(vscode.window.activeTextEditor.document.uri);
+        if (currentPackage) {
+            status.text = `Package: ${currentPackage.split("/").slice(-1)}`;
+            status.show();
+        } else {
+            status.text = '';
+            status.hide();
+        }
+    }
+
+    
     let goToPackageCommand = vscode.commands.registerCommand('extension.goToPackage', () => {
         let packageFileContent  = fs.readFileSync(path.join(vscode.workspace.rootPath, 'Rdm.packages')).toString();
         let packageList         = PackageParser(packageFileContent);

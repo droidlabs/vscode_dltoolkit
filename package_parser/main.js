@@ -1,13 +1,19 @@
 'use strict';
 
-module.exports = function packageParser(textDocument) {
-  const packageDefinitionRegexp = new RegExp("\\s*package\\s*\'([\\w\/]+)\'", "i");
-  
-  let result = textDocument.split("\n").filter((string) => {
-    return packageDefinitionRegexp.test(string);
-  });
+const vscode = require('vscode');
+const path   = require('path');
+const fs     = require('fs');
 
-  return result.map(item => {
-    return item.match(packageDefinitionRegexp)[1]
-  });
+module.exports = class PackageParser {
+  constructor() {
+    this.packageDefinitionRegexp = new RegExp("\\s*package\\s*\'([\\w\/]+)\'", "i");
+    this.document = fs.readFileSync(path.join(vscode.workspace.rootPath, 'Rdm.packages')).toString();
+  }
+  getCurrentPackage(uri) {
+    return this.getPackageList().find(packageItem => ~uri.path.toString().indexOf(packageItem));
+  }
+  getPackageList() {
+    return this.document.split("\n").filter(string => this.packageDefinitionRegexp.test(string))
+                                    .map(string => string.match(this.packageDefinitionRegexp)[1]);
+  }
 }

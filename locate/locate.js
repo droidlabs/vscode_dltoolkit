@@ -17,7 +17,7 @@ function flatten(locateInfo, file, containerName = '', containerBean) {
 		}
 		return _.flatMap(symbols, (inner, name) => {
 			const posn = inner.posn || { line: 0, char: 0 };
-			let packageName = getPackageList().find(pack => new RegExp(pack).test(file))
+			let packageName = new PackageParser().getPackageList().find(pack => new RegExp(pack).test(file));
 			if (packageName) packageName = packageName.split('/').slice(-1);
 			const symbolInfo = {
 				name: name,
@@ -66,11 +66,6 @@ function filter(symbols, query, matcher) {
 		.flatMap(regexp => symbols.filter(symbolInfo => matcher(symbolInfo, regexp)))
 		.uniq()
 		.value();
-}
-function getPackageList() {
-	const RDM_FILE = 'Rdm.packages';
-	let rdmPackages = path.join(vscode.workspace.rootPath, RDM_FILE);
-	return PackageParser(fs.readFileSync(rdmPackages).toString());
 }
 module.exports = class Locate {
 	constructor(root, settings) {
