@@ -4,8 +4,7 @@ const locator   		= require('../ruby-method-locate/main'),
       fs        		= require('fs'),
 	    path      		= require('path'),
       _         		= require('lodash'),
-			PackageParser = require('../package_parser/main'),
-			vscode				= require('vscode');
+			PackageParser = require('../package_parser/main');
 
 const DECLARATION_TYPES = ['class', 'module', 'method', 'classMethod', 'bean', 'inject'];
 
@@ -18,7 +17,10 @@ function flatten(locateInfo, file, containerName = '', containerBean) {
 		return _.flatMap(symbols, (inner, name) => {
 			const posn = inner.posn || { line: 0, char: 0 };
 			let packageName = new PackageParser().getPackageList().find(pack => new RegExp(pack).test(file));
-			if (packageName) packageName = packageName.split('/').slice(-1);
+			
+			if (packageName) {
+				packageName = packageName.split('/').slice(-1);
+			}
 			const symbolInfo = {
 				name: name,
 				type: type,

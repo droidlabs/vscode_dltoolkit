@@ -72,8 +72,7 @@ function activate(context) {
 
     
     let goToPackageCommand = vscode.commands.registerCommand('extension.goToPackage', () => {
-        let packageFileContent  = fs.readFileSync(path.join(vscode.workspace.rootPath, 'Rdm.packages')).toString();
-        let packageList         = PackageParser(packageFileContent);
+        let packageList         = new PackageParser().getPackageList();
         
         (function showPackageDialog() {
             vscode.window.showQuickPick(packageList, {
@@ -83,7 +82,7 @@ function activate(context) {
 
                 let packageDirectory    = path.join(vscode.workspace.rootPath, selection);
                 let packageFilesList    = getFilesListForDirectory(packageDirectory).map((item) => {
-                    return item.replace(packageDirectory, '');
+                    return item.replace(packageDirectory + '/', '');
                 }).filter((file) => {
                     let hiddenFilesRegExp = new RegExp("^\.\\w+$", 'i');
                     return !hiddenFilesRegExp.test(path.basename(file));
@@ -92,7 +91,10 @@ function activate(context) {
                 vscode.window.showQuickPick(packageFilesList, {
                     placeHolder: "Enter file name:"
                 }).then((pickedFile) => {
-                    if (!pickedFile) showPackageDialog();
+                    if (!pickedFile) {
+                        showPackageDialog();
+                        return;
+                    }
 
                     let fullPickedFile = path.join(packageDirectory, pickedFile);
                     vscode.workspace.openTextDocument(fullPickedFile).then((textDocument) => {
