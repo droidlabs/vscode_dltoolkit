@@ -6,6 +6,9 @@ const locator   		= require('../ruby-method-locate/main'),
       _         		= require('lodash'),
 			PackageParser = require('../package_parser/main');
 
+const vscode    = require('vscode');
+const settings  = vscode.workspace.getConfiguration("ruby.locate") || {};
+
 const DECLARATION_TYPES = ['class', 'module', 'method', 'classMethod', 'bean', 'inject'];
 
 function flatten(locateInfo, file, containerName = '', containerBean) {
@@ -16,7 +19,7 @@ function flatten(locateInfo, file, containerName = '', containerBean) {
 		}
 		return _.flatMap(symbols, (inner, name) => {
 			const posn = inner.posn || { line: 0, char: 0 };
-			let packageName = new PackageParser().getPackageList().find(pack => new RegExp(pack).test(file));
+			let packageName = PackageParser.getPackageList().find(pack => new RegExp(pack).test(file));
 			
 			if (packageName) {
 				packageName = packageName.split('/').slice(-1)[0];
@@ -44,32 +47,7 @@ function flatten(locateInfo, file, containerName = '', containerBean) {
 		});
 	});
 }
-function camelCaseRegExp(query) {
-	const escaped = _.escapeRegExp(query)
-	const prefix = escaped.charAt(0);
-	return new RegExp(
-		`[${prefix.toLowerCase()}${prefix.toUpperCase()}]` +
-		escaped.slice(1).replace(/[A-Z]|([a-z])/g, (char, lower) => {
-			if (lower) return `[${char.toUpperCase()}${char}]`;
-			const lowered = char.toLowerCase()
-			return `.*(?:${char}|_${lowered})`;
-		})
-	);
-}
-function filter(symbols, query, matcher) {
-	// TODO: Ask MS to expose or separate matchesFuzzy method.
-	// https://github.com/Microsoft/vscode/blob/a1d3c8a3006d0a3d68495122ea09a2a37bca69db/src/vs/base/common/filters.ts
-	const isLowerCase = (query.toLowerCase() === query)
-	const exact = new RegExp('^' + _.escapeRegExp(query) + '$', 'i');
-	const prefix = new RegExp('^' + _.escapeRegExp(query), 'i');
-	const substring = new RegExp(_.escapeRegExp(query), isLowerCase ? 'i' : '');
-	const camelCase = camelCaseRegExp(query);
-	return _([exact, prefix, substring, camelCase])
-		.flatMap(regexp => symbols.filter(symbolInfo => matcher(symbolInfo, regexp)))
-		.uniq()
-		.value();
-}
-module.exports = class Locate {
+class Locate {
 	constructor(root, settings) {
 		this.settings = settings;
 		this.root = root;
@@ -87,8 +65,9 @@ module.exports = class Locate {
 	find(name, type) {
 		// because our word pattern is designed to match symbols
 		// things like Gem::RequestSet may request a search for ':RequestSet'
-		const escapedName = _.escapeRegExp(_.trimStart(name, ':'));
-		const regexp = new RegExp(`^${escapedName}=?\$`);
+
+		const escapedName = name ? _.escapeRegExp(_.trimStart(name, ':')) : '.*';
+		const regexp = new RegExp(`^${escapedName}?\$`);
 		const allowedTypes = type || ['class', 'module', 'method', 'classMethod'];
 
 		return _(this.tree)
@@ -97,30 +76,6 @@ module.exports = class Locate {
       .filter(symbol => { return regexp.test(symbol.name) && allowedTypes.includes(symbol.type) })
 			.map(_.clone)
 			.value();
-	}
-	query(query) {
-		const segmentMatch = query.match(/^(?:([^.#:]+)(.|#|::))([^.#:]+)$/) || [];
-		const containerQuery = segmentMatch[1];
-		const separator = segmentMatch[2];
-		const nameQuery = segmentMatch[3];
-		const separatorToTypesTable = {
-			'.': ['classMethod', 'method'],
-			'#': ['method'],
-			'::': ['class', 'module'],
-		};
-		const segmentTypes = separatorToTypesTable[separator];
-		const symbols = _(this.tree).values().flatten().value();
-
-		// query whole name (matches `class Foo::Bar` or `def File.read`)
-		const plainMatches = filter(symbols, query, (symbolInfo, regexp) => regexp.test(symbolInfo.name));
-		if (!containerQuery) return plainMatches;
-
-		// query name and containerName separatedly (matches `def foo` in `class Bar`)
-		const nameMatches = filter(symbols, nameQuery, (symbolInfo, regexp) => {
-			return _.includes(segmentTypes, symbolInfo.type) && regexp.test(symbolInfo.name);
-		});
-		const containerMatches = filter(nameMatches, containerQuery, (symbolInfo, regexp) => regexp.test(symbolInfo.containerName))
-		return _.uniq(plainMatches.concat(containerMatches));
 	}
 	rm(absPath) {
 		if (absPath in this.tree) delete this.tree[absPath];
@@ -163,3 +118,5 @@ module.exports = class Locate {
 		});
 	}
 };
+
+module.exports = new Locate(vscode.workspace.rootPath, settings);

@@ -1,8 +1,8 @@
 const vscode            = require('vscode');
 
-const Locate            = require('./locate/locate');
 const CheckEmptyInject  = require('./check_empty_inject/main');
 const PackageParser     = require('./package_parser/main');
+const Commands          = require('./commands/all');
 
 const fs                = require('fs');
 const path              = require('path');
@@ -11,57 +11,18 @@ const mkdirp            = require('mkdirp');
 function activate(context) {
     if (!vscode.workspace.rootPath) return;
 
-    const settings = vscode.workspace.getConfiguration("ruby.locate") || {};
-    let locate = new Locate(vscode.workspace.rootPath, settings);
-    const beanProvider = {
-        provideDefinition: (doc, pos) => {
-            let bean = doc.getText(doc.getWordRangeAtPosition(pos));
-            bean = getBeanRefirement(doc, bean);
-            const matches = locate.find(bean, ['bean']);
-
-            return matches.map(m => new vscode.Location(vscode.Uri.file(m.file), new vscode.Position(m.line, m.char)));
-        }
-    };
-    context.subscriptions.push(vscode.languages.registerDefinitionProvider(['ruby'], beanProvider));
-
-    let findBeanUsageCommand = vscode.commands.registerCommand('extension.findBeanUsage', () => {
-        let beanDefinitionRegexp = new RegExp("\\s*bean\\s+:(\\w+)", "i");
-        let fileContent = vscode.window.activeTextEditor.document.getText().split("\n");
-
-        let beanDefinition = fileContent.find((item) => {return beanDefinitionRegexp.test(item)});
-        if (!beanDefinition) return;
-
-        let beanName = beanDefinition.match(beanDefinitionRegexp)[1];
-        
-        let beanUsage = locate.find(beanName, ['inject']);
-        vscode.window.showQuickPick(beanUsage.map((item) => {
-            // TODO: https://github.com/Microsoft/vscode/issues/8886 mark opened files at list
-            // let list = vscode.window.visibleTextEditors.map((item) => item.document.uri.path);
-            // let opened = list.includes(item.file) ? ': (opened)' : '';
-            let formattedPackageName = `${item.package} => ${item.containerBean}`;
-            return formattedPackageName || item.file;
-        }), {
-            placeHolder: "Enter inject name:"
-        }).then((selection) => {
-            if (!selection) return;
-
-            let dependentFile = beanUsage.find((bean) => {
-                let beanOfFileName = selection.split(' ')[1];
-                return bean.containerBean == beanOfFileName || bean.file == selection
-            });
-
-            vscode.workspace.openTextDocument(dependentFile.file).then((textDocument) => {
-                vscode.window.showTextDocument(textDocument);
-            });
-        })
-    });
-    context.subscriptions.push(findBeanUsageCommand);
+    context.subscriptions.push(
+        vscode.languages.registerDefinitionProvider(['ruby'],       Commands.buildBeanProviderDefinition()),
+        vscode.commands.registerCommand('extension.findBeanUsage',  Commands.findBeanUsageCommand()),
+        vscode.commands.registerCommand('extension.goToPackage',    Commands.goToPackageCommand()),
+        vscode.commands.registerCommand('extension.showAllBeans',   Commands.showAllBeansCommand())
+    );
 
     const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
     context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(getPackageName));
     context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(getPackageName));
     function getPackageName() {
-        let currentPackage = new PackageParser().getCurrentPackage(vscode.window.activeTextEditor.document.uri);
+        let currentPackage = PackageParser.getCurrentPackage(vscode.window.activeTextEditor.document.uri);
         if (currentPackage) {
             status.text = `Package: ${currentPackage.split("/").slice(-1)}`;
             status.show();
@@ -70,42 +31,6 @@ function activate(context) {
             status.hide();
         }
     }
-
-    
-    let goToPackageCommand = vscode.commands.registerCommand('extension.goToPackage', () => {
-        let packageList         = new PackageParser().getPackageList();
-        
-        (function showPackageDialog() {
-            vscode.window.showQuickPick(packageList, {
-                placeHolder: "Enter package name"
-            }).then((selection) => {
-                if (!selection) return;
-
-                let packageDirectory    = path.join(vscode.workspace.rootPath, selection);
-                let packageFilesList    = getFilesListForDirectory(packageDirectory).map((item) => {
-                    return item.replace(packageDirectory + '/', '');
-                }).filter((file) => {
-                    let hiddenFilesRegExp = new RegExp("^\.\\w+$", 'i');
-                    return !hiddenFilesRegExp.test(path.basename(file));
-                });
-            
-                vscode.window.showQuickPick(packageFilesList, {
-                    placeHolder: "Enter file name:"
-                }).then((pickedFile) => {
-                    if (!pickedFile) {
-                        showPackageDialog();
-                        return;
-                    }
-
-                    let fullPickedFile = path.join(packageDirectory, pickedFile);
-                    vscode.workspace.openTextDocument(fullPickedFile).then((textDocument) => {
-                        vscode.window.showTextDocument(textDocument);
-                    });
-                });
-            });
-        })();
-    });
-    context.subscriptions.push(goToPackageCommand);
 
     let onSave = vscode.workspace.onDidSaveTextDocument((document) => {
         let specRegExp = new RegExp(".*_spec.rb", "i");
@@ -307,16 +232,4 @@ function classify(snake_case) {
     return capitalizeFirstLetter(result)
 }
 
-function getBeanRefirement(document, beanName) {
-    let injectDefinitionRegex = new RegExp("inject\\s+:"+ beanName +",\\s+ref:\\s+:(\\w+)", "i");
-    
-    for (let i=0;i<document.lineCount;i++) {
-        let line = document.lineAt(i).text;
-        if (injectDefinitionRegex.test(line)) {
-            return line.match(injectDefinitionRegex)[1]
-        }
-    }
-
-    return beanName;
-}
 

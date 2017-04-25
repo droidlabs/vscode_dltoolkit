@@ -71,6 +71,10 @@
             {
                 "command": "extension.findBeanUsage",
                 "title": "Files: Show bean usage"
+            },
+            {
+                "command": "extension.showAllBeans",
+                "title": "Files: Show all beans in project"
             }
         ],
         "keybindings": [
@@ -93,6 +97,11 @@
                 "command": "extension.findBeanUsage",
                 "key": "ctrl+alt+i",
                 "mac": "ctrl+cmd+i"
+            },
+            {
+                "command": "extension.showAllBeans",
+                "key": "ctrl+alt+b",
+                "mac": "ctrl+cmd+b"
             }
         ]
     }

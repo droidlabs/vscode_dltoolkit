@@ -4,7 +4,7 @@ const vscode = require('vscode');
 const path   = require('path');
 const fs     = require('fs');
 
-module.exports = class PackageParser {
+class PackageParser {
   constructor() {
     this.packageDefinitionRegexp = new RegExp("\\s*package\\s*\'([\\w\/]+)\'", "i");
     this.document = fs.readFileSync(path.join(vscode.workspace.rootPath, 'Rdm.packages')).toString();
@@ -17,3 +17,5 @@ module.exports = class PackageParser {
                                     .map(string => string.match(this.packageDefinitionRegexp)[1]);
   }
 }
+
+module.exports = new PackageParser();
