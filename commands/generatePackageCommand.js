@@ -38,12 +38,15 @@ module.exports = class GeneratePackageCommand {
   RdmCreatePackage(name, folder) {
     let exec = require('child_process').exec;
     let fullPath = path.join(vscode.workspace.rootPath, folder, name);
-    let mainFile = path.join(fullPath, `package/${name}.rb`);
+    let relPath  = path.join(folder, name);
+    let filePath = path.join(`package/${name}.rb`);
+    let mainFile = path.join(fullPath, filePath);
 
-    mkdirp.sync(fullPath);
-
-    exec(`cd ${vscode.workspace.rootPath} && rdm gen.package ${name} --path=${fullPath}`, (err, stdout, stderr) => {
+    mkdirp.sync(path.join(vscode.workspace.rootPath, folder));
+    exec(`cd ${vscode.workspace.rootPath} && rdm gen.package ${name} --path=${relPath}`, (err, stdout, stderr) => {
+      vscode.window.showWarningMessage(stdout);
       if (err) {
+        vscode.window.showWarningMessage(stderr);
         return;
       }
 
