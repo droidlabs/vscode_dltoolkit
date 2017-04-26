@@ -12,10 +12,11 @@ function activate(context) {
     if (!vscode.workspace.rootPath) return;
 
     context.subscriptions.push(
-        vscode.languages.registerDefinitionProvider(['ruby'],       Commands.buildBeanProviderDefinition()),
-        vscode.commands.registerCommand('extension.findBeanUsage',  Commands.findBeanUsageCommand()),
-        vscode.commands.registerCommand('extension.goToPackage',    Commands.goToPackageCommand()),
-        vscode.commands.registerCommand('extension.showAllBeans',   Commands.showAllBeansCommand())
+        vscode.languages.registerDefinitionProvider(['ruby'],           Commands.buildBeanProviderDefinition()),
+        vscode.commands.registerCommand('extension.findBeanUsage',      Commands.findBeanUsageCommand()),
+        vscode.commands.registerCommand('extension.goToPackage',        Commands.goToPackageCommand()),
+        vscode.commands.registerCommand('extension.showAllBeans',       Commands.showAllBeansCommand()),
+        vscode.commands.registerCommand('extension.generateNewPackage', Commands.generatePackageCommand())
     );
 
     const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
