@@ -2,7 +2,7 @@
     "name": "droidlabs-toolkit",
     "displayName": "DroidLabs Toolkit",
     "description": "",
-    "version": "0.0.25",
+    "version": "0.0.26",
     "icon": "images/droidlabs.jpg",
     "publisher": "vocrsz",
     "engines": {
@@ -79,6 +79,10 @@
             {
                 "command": "extension.generateNewPackage",
                 "title": "Files: Generate new Rdm package"
+            },
+            {
+                "command": "extension.generateNewBean",
+                "title": "Files: Generate new Rdm Bean"
             }
         ],
         "keybindings": [
@@ -111,6 +115,11 @@
                 "command": "extension.generateNewPackage",
                 "key": "ctrl+alt+g",
                 "mac": "ctrl+cmd+g"
+            },
+            {
+                "command": "extension.generateNewBean",
+                "key": "ctrl+alt+b",
+                "mac": "ctrl+cmd+b"
             }
         ]
     }

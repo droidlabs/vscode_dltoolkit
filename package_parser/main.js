@@ -16,6 +16,11 @@ class PackageParser {
     return this.document.split("\n").filter(string => this.packageDefinitionRegexp.test(string))
                                     .map(string => string.match(this.packageDefinitionRegexp)[1]);
   }
+  getPackageModuleUrl(packageName) {
+    let packageMainFile    = packageName.split('/').slice(-1) + '.rb';
+    const packageSubfolder = 'package';
+    return path.join(vscode.workspace.rootPath, packageName, packageSubfolder, packageMainFile);
+  }
 }
 
 module.exports = new PackageParser();

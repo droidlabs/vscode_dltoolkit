@@ -22,7 +22,7 @@ function flatten(locateInfo, file, containerName = '', containerBean) {
 			let packageName = PackageParser.getPackageList().find(pack => new RegExp(pack).test(file));
 			
 			if (packageName) {
-				packageName = packageName.split('/').slice(-1)[0];
+				packageName = packageName;
 			}
 			const symbolInfo = {
 				name: name,

@@ -16,7 +16,8 @@ function activate(context) {
         vscode.commands.registerCommand('extension.findBeanUsage',      Commands.findBeanUsageCommand()),
         vscode.commands.registerCommand('extension.goToPackage',        Commands.goToPackageCommand()),
         vscode.commands.registerCommand('extension.showAllBeans',       Commands.showAllBeansCommand()),
-        vscode.commands.registerCommand('extension.generateNewPackage', Commands.generatePackageCommand())
+        vscode.commands.registerCommand('extension.generateNewPackage', Commands.generatePackageCommand()),
+        vscode.commands.registerCommand('extension.generateNewBean',    Commands.generateBeanCommand())
     );
 
     const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
