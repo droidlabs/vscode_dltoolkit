@@ -2,7 +2,7 @@
     "name": "droidlabs-toolkit",
     "displayName": "DroidLabs Toolkit",
     "description": "",
-    "version": "0.0.26",
+    "version": "0.0.27",
     "icon": "images/droidlabs.jpg",
     "publisher": "vocrsz",
     "engines": {
@@ -118,8 +118,8 @@
             },
             {
                 "command": "extension.generateNewBean",
-                "key": "ctrl+alt+b",
-                "mac": "ctrl+cmd+b"
+                "key": "ctrl+alt+n",
+                "mac": "ctrl+cmd+n"
             }
         ]
     }
