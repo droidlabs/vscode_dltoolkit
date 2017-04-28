@@ -24,7 +24,7 @@ function activate(context) {
     context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(getPackageName));
     context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(getPackageName));
     function getPackageName() {
-        let currentPackage = PackageParser.getCurrentPackage(vscode.window.activeTextEditor.document.uri);
+        let currentPackage = PackageParser.getCurrentPackage(vscode.window.activeTextEditor.document.uri.path.toString());
         if (currentPackage) {
             status.text = `Package: ${currentPackage.split("/").slice(-1)}`;
             status.show();

@@ -10,7 +10,7 @@ class PackageParser {
     this.document = fs.readFileSync(path.join(vscode.workspace.rootPath, 'Rdm.packages')).toString();
   }
   getCurrentPackage(uri) {
-    return this.getPackageList().find(packageItem => ~uri.path.toString().indexOf(packageItem));
+    return this.getPackageList().find(packageItem => ~uri.toString().indexOf(packageItem));
   }
   getPackageList() {
     return this.document.split("\n").filter(string => this.packageDefinitionRegexp.test(string))
