@@ -1,7 +1,7 @@
-const vscode = require('vscode');
-const path   = require('path');
-const mkdirp = require('mkdirp');
-const PackageParser = require('../package_parser/main');
+const vscode       = require('vscode');
+const path         = require('path');
+const mkdirp       = require('mkdirp');
+const PackageUtils = require('../utils/package_utils');
 
 module.exports = class GeneratePackageCommand {
   static get CREATE_NEW_FOLDER() { return 'Новая папка:' }
@@ -28,10 +28,7 @@ module.exports = class GeneratePackageCommand {
     })
   }
   packageLocationFolders() {
-    let result = PackageParser.getPackageList()
-                              .map(item => item.split("/")
-                              .slice(0, -1).join('/'))
-                              .filter((item, index, array) => array.indexOf(item) == index);
+    let result = PackageUtils.getRdmPackagesList(vscode.workspace.rootPath).map(pkg => pkg.humanName())
     result.unshift(GeneratePackageCommand.CREATE_NEW_FOLDER);
     return result;
   }

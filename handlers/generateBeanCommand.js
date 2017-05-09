@@ -1,8 +1,9 @@
-const vscode = require('vscode');
-const path   = require('path');
-const fs     = require('fs');
-const PackageParser = require('../package_parser/main');
-const Utils = require('../utils/utils');
+const vscode        = require('vscode');
+const path          = require('path');
+const fs            = require('fs');
+const PackageUtils  = require('../utils/package_utils');
+const FileUtils     = require('../utils/file_utils');
+const StringUtils   = require('../utils/string_utils');
 
 module.exports = class GenerateNewBean {
   constructor() {
@@ -16,13 +17,13 @@ module.exports = class GenerateNewBean {
     ).then(pkg => {
       if (!pkg) return;
       if (pkg == 'Current package') {
-        let currentPackage = PackageParser.getCurrentPackage(vscode.window.activeTextEditor.document.uri);
+        let currentPackage = PackageUtils.getRdmPackageForFile(vscode.window.activeTextEditor.document.uri);
         this.pickBeanFolder(currentPackage);
         return;
       }
 
       vscode.window.showQuickPick(
-        PackageParser.getPackageList()
+        PackageUtils.getRdmPackagesList(vscode.workspace.rootPath)
       ).then(otherPkg => {
         if (!otherPkg) return;
         this.pickBeanFolder(otherPkg);
@@ -32,8 +33,8 @@ module.exports = class GenerateNewBean {
   }
   pickBeanFolder(pkg) {
     let self = this;
-    let packageDirectory   = path.join(vscode.workspace.rootPath, pkg, 'package');
-    let packageFoldersList = Utils.getFoldersForDirectory(packageDirectory).map(item => {
+    let packageDirectory   = path.join(pkg.location(), 'package');
+    let packageFoldersList = FileUtils.getFoldersForDirectory(packageDirectory).map(item => {
       return path.relative(packageDirectory, item);
     });
     vscode.window.showQuickPick(packageFoldersList, {
@@ -49,9 +50,9 @@ module.exports = class GenerateNewBean {
       if (!beanName) return;
 
       let fullBeanFileName = path.join(folder, beanName + '.rb');
-      let packageName      = PackageParser.getCurrentPackage(fullBeanFileName);
+      let packageName      = PackageUtils.getRdmPackageForFile(fullBeanFileName);
       let forldersForClass = path.relative(path.join(vscode.workspace.rootPath, packageName, 'package'), fullBeanFileName).replace('.rb', '');
-      let className        = Utils.classify(forldersForClass, beanName);
+      let className        = StringUtils.classify(forldersForClass, beanName);
 
       if (!fs.existsSync(fullBeanFileName)) {
         fs.appendFile(fullBeanFileName, 

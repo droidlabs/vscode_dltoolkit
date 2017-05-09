@@ -1,6 +1,10 @@
-const vscode = require('vscode');
-const Locate = require('../locate/locate');
-const PackageParser = require('../package_parser/main');
+const vscode        = require('vscode');
+const Locate        = require('../locate/locate');
+const LocateService = new Locate(
+  vscode.workspace.rootPath, 
+  vscode.workspace.getConfiguration("ruby.locate") || {}
+);
+const PackageUtils  = require('../utils/package_utils');
 
 module.exports = class FindBeanUsageCommand {
   constructor() {
@@ -11,7 +15,7 @@ module.exports = class FindBeanUsageCommand {
     let beanName = this.findBeanName(vscode.window.activeTextEditor.document.getText().split("\n"));
     if (!beanName) return;
 
-    let beansGroupedByPackage = Locate.find(beanName, ['inject']).reduce((groupedByPackage, bean) => {
+    let beansGroupedByPackage = LocateService.find(beanName, ['inject']).reduce((groupedByPackage, bean) => {
       let data = groupedByPackage.find(item => item.name == bean.package);
       if (data) {
         data.beans.push({
@@ -25,7 +29,7 @@ module.exports = class FindBeanUsageCommand {
       groupedByPackage.push({ 
         name:           bean.package, 
         formattedName:  this.formatPackageToQuickPick(bean.package),
-        url:            PackageParser.getPackageModuleUrl(bean.package),
+        url:            PackageUtils.getRdmPackageForFile(bean.file).pathToModuleFile(),
         beans: [
           {
             name: bean.containerBean,

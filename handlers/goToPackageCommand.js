@@ -1,7 +1,7 @@
 const vscode        = require('vscode');
 const path          = require('path');
 const fs            = require('fs');
-const PackageParser = require('../package_parser/main');
+const PackageUtils = require('../utils/package_utils');
 
 module.exports = class GoToPackageCommand {
   constructor() {
@@ -11,7 +11,7 @@ module.exports = class GoToPackageCommand {
   handler() {
     const self = this;
     (function showPackageDialog() {
-      vscode.window.showQuickPick(PackageParser.getPackageList(), {
+      vscode.window.showQuickPick(PackageUtils.getRdmPackagesList(vscode.workspace.rootPath).map(pkg => pkg.name), {
         placeHolder: "Enter package name:"
       }).then(selectedPackage => {
         if (!selectedPackage) return;

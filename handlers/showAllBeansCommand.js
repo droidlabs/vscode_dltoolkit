@@ -1,15 +1,17 @@
-const Locate        = require('../locate/locate');
-const PackageParser = require('../package_parser/main');
-
 const vscode        = require('vscode');
+const Locate        = require('../locate/locate');
+const LocateService = new Locate(
+  vscode.workspace.rootPath, 
+  vscode.workspace.getConfiguration("ruby.locate") || {}
+);
+const PackageUtils = require('../utils/package_utils');
 
 module.exports = class ShowAllBeansCommand {
   constructor() {
     return this.handler.bind(this);
   }
   handler() {
-    
-    let beansGroupedByPackage = Locate.find('', ['bean']).reduce((groupedByPackage, bean) => {
+    let beansGroupedByPackage = LocateService.find('', ['bean']).reduce((groupedByPackage, bean) => {
       let data = groupedByPackage.find(item => item.name == bean.package);
       if (data) {
         data.beans.push({
@@ -23,7 +25,7 @@ module.exports = class ShowAllBeansCommand {
       groupedByPackage.push({ 
         name:           bean.package, 
         formattedName:  this.formatPackageToQuickPick(bean.package),
-        url:            PackageParser.getPackageModuleUrl(bean.package),
+        url:            PackageUtils.getRdmPackageForFile(bean.file).pathToModuleFile(),
         beans: [
           {
             name: bean.name,

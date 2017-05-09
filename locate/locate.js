@@ -4,10 +4,9 @@ const locator   		= require('../ruby-method-locate/main'),
       fs        		= require('fs'),
 	    path      		= require('path'),
       _         		= require('lodash'),
-			PackageParser = require('../package_parser/main');
+			PackageUtils 	= require('../utils/package_utils');
 
 const vscode    = require('vscode');
-const settings  = vscode.workspace.getConfiguration("ruby.locate") || {};
 
 const DECLARATION_TYPES = ['class', 'module', 'method', 'classMethod', 'bean', 'inject'];
 
@@ -19,7 +18,7 @@ function flatten(locateInfo, file, containerName = '', containerBean) {
 		}
 		return _.flatMap(symbols, (inner, name) => {
 			const posn = inner.posn || { line: 0, char: 0 };
-			let packageName = PackageParser.getPackageList().find(pack => new RegExp(pack).test(file));
+			let packageName = PackageUtils.getRdmPackagesList(vscode.workspace.rootPath).find(pack => new RegExp(pack).test(file));
 			
 			if (packageName) {
 				packageName = packageName;
@@ -47,8 +46,9 @@ function flatten(locateInfo, file, containerName = '', containerBean) {
 		});
 	});
 }
-class Locate {
+module.exports = class Locate {
 	constructor(root, settings) {
+		if (!root) return false;
 		this.settings = settings;
 		this.root = root;
 		this.tree = {};
@@ -118,5 +118,3 @@ class Locate {
 		});
 	}
 };
-
-module.exports = new Locate(vscode.workspace.rootPath, settings);
