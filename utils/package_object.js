@@ -38,6 +38,13 @@ module.exports = class PackageObject {
     return StringUtils.classify(this.name);
   }
 
+  // @option index [Integer], number of package string, ex: 1
+  // @return [String], name of selected package to show at QuickPick List, 
+  //    ex: '1. CacheSystem'
+  nameToQuickPick(index) {
+    return `${index}. Package: ${this.humanName()}`
+  }
+
   // @option []
   // @return [String], absolute path to package folder, 
   //    ex: '/User/project/droidlabs_toolkit/subsystems/cache_system/'

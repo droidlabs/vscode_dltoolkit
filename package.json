@@ -60,7 +60,7 @@
                 "title": "Files: Show Spec File"
             },
             {
-                "command": "extension.checkEmptyInject",
+                "command": "extension.removeUnusedInjectedDeps",
                 "title": "Files: Check Empty Inject"
             },
             {
@@ -91,7 +91,7 @@
                 "mac": "ctrl+cmd+r"
             },
             {
-                "command": "extension.checkEmptyInject",
+                "command": "extension.removeUnusedInjectedDeps",
                 "key": "ctrl+alt+e",
                 "mac": "ctrl+cmd+e"
             },

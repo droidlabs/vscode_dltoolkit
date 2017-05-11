@@ -1,7 +1,9 @@
 class Project::ProjectCreator
   bean :project_creator
 
-  def handle
+  inject :project_repository
 
+  def handle(data)
+    project_repository.put(data)
   end
 end

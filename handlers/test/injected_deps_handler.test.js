@@ -3,7 +3,7 @@ const path             = require('path');
 const mkdirp           = require('mkdirp');
 const fs               = require('fs');   
 const assert           = require('assert');
-const BeanCheckHandler = require('../bean_check_handler');
+const BeanCheckHandler = require('../injected_deps_handler');
 
 const NotClearFileContent = `
 class DynamicClass
@@ -33,7 +33,7 @@ class DynamicClass
 end
 `;
 
-describe("#beanCheckHandler", () => { 
+describe("#injectedDepsHandler", () => { 
   describe("if no duplicated or unused beans present", () => {
     const clearTestFile = path.join(__dirname, 'fixtures', 'clear_file.rb');
     

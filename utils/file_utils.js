@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+const fs    = require('fs');
+const path  = require('path');
 
 module.exports = class FileUtils {
   static getFilesListForDirectory(dir) {
@@ -7,8 +7,11 @@ module.exports = class FileUtils {
     var list = fs.readdirSync(dir);
 
     list.forEach(function(file) {
-      file = dir + '/' + file
+      if (/^\..*/i.test(file)) return;
+      file = path.join(dir, file)
+
       var stat = fs.statSync(file)
+
       if (stat && stat.isDirectory()) results = results.concat(FileUtils.getFilesListForDirectory(file))
       else results.push(file)
     });

@@ -1,4 +1,3 @@
-'use strict';
 const locator   		= require('../ruby-method-locate/main'),
 	    minimatch 		= require('minimatch'),
       fs        		= require('fs'),
@@ -6,7 +5,7 @@ const locator   		= require('../ruby-method-locate/main'),
       _         		= require('lodash'),
 			PackageUtils 	= require('../utils/package_utils');
 
-const vscode    = require('vscode');
+const vscode = require('vscode');
 
 const DECLARATION_TYPES = ['class', 'module', 'method', 'classMethod', 'bean', 'inject'];
 
@@ -17,12 +16,8 @@ function flatten(locateInfo, file, containerName = '', containerBean) {
 			return [];
 		}
 		return _.flatMap(symbols, (inner, name) => {
-			const posn = inner.posn || { line: 0, char: 0 };
-			let packageName = PackageUtils.getRdmPackagesList(vscode.workspace.rootPath).find(pack => new RegExp(pack).test(file));
-			
-			if (packageName) {
-				packageName = packageName;
-			}
+			const posn          = inner.posn || { line: 0, char: 0 };
+
 			const symbolInfo = {
 				name: name,
 				type: type,
@@ -31,7 +26,7 @@ function flatten(locateInfo, file, containerName = '', containerBean) {
 				char: posn.char,
 				containerName: containerName || '',
 				containerBean: containerBean,
-				package: packageName
+				package: PackageUtils.getRdmPackageForFile(file)
 			};
 			_.extend(symbolInfo, _.omit(inner, DECLARATION_TYPES));
 			const sep = { method: '#', classMethod: '.' }[type] || '::';
@@ -46,12 +41,11 @@ function flatten(locateInfo, file, containerName = '', containerBean) {
 		});
 	});
 }
-module.exports = class Locate {
-	constructor(root, settings) {
-		if (!root) return false;
-		this.settings = settings;
-		this.root = root;
-		this.tree = {};
+class Locate {
+	constructor() {
+		this.settings = vscode.workspace.getConfiguration("ruby.locate");
+		this.root     = path.dirname(PackageUtils.getRdmRootFile(vscode.workspace.rootPath));
+		this.tree     = {};
 		// begin the build ...
 		this.walk(this.root);
 		// add edit hooks
@@ -76,6 +70,45 @@ module.exports = class Locate {
       .filter(symbol => { return regexp.test(symbol.name) && allowedTypes.includes(symbol.type) })
 			.map(_.clone)
 			.value();
+	}
+	findGroupedByPackage(name, type) {
+		return this.find(name, type).reduce((groupedByPackage, bean) => {
+      let data = groupedByPackage.find(item => item.package.name == bean.package.name);
+    
+      if (data) {
+        data.beans.push({
+          name:          bean.containerBean,
+          url:           bean.file
+        });
+
+        return groupedByPackage;
+      }
+
+      groupedByPackage.push({ 
+        package: bean.package, 
+        beans: [
+          {
+            name: bean.containerBean,
+            url:  bean.file
+          }
+        ] 
+      });
+      
+      return groupedByPackage;
+    }, []);
+	}
+	findForQuickPick(name, type) {
+		let quickPickData = [];
+
+		this.findGroupedByPackage(name, type).forEach((pkg, index) => {
+			quickPickData.push(pkg.package.nameToQuickPick(++index));
+
+			pkg.beans.forEach((bean, beanIndex) => {
+				quickPickData.push(`    ${index}.${++beanIndex}. ${bean.name}`);
+			});
+		});
+
+		return quickPickData;
 	}
 	rm(absPath) {
 		if (absPath in this.tree) delete this.tree[absPath];
@@ -118,3 +151,5 @@ module.exports = class Locate {
 		});
 	}
 };
+
+module.exports = new Locate();

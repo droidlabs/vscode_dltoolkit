@@ -73,7 +73,7 @@ describe("class BeanUtils", () => {
           {
             duplicatedBeans: ['duplicated_examples'],
             unusedBeans:     ['unused_examples'],
-            stringsToDelete: [3,w5]
+            stringsToDelete: [3,5]
           }
         )
       });
