@@ -27,6 +27,7 @@ function commandHandler() {
 
 function onSaveHandler(document) {
     if (~document.uri.path.indexOf('_spec.rb')) return;
+    if (!~document.uri.path.indexOf('.rb')) return;
 
     let checkBeansData = BeanUtils.checkInjects(document.getText());
     
