@@ -19,7 +19,7 @@ module.exports = class FindBeanUsageHandler {
         const groupedByPackage      = Locate.findGroupedByPackage(beanData.name, ['inject']);
         const groupedForQuickPicker = Locate.findForQuickPick(beanData.name, ['inject']);
 
-        return this.quickPicker(groupedForQuickPicker, 'Pick bean to go:').then(selectedBean => {
+        return this.quickPicker(groupedForQuickPicker, 'Select bean:').then(selectedBean => {
           if (!selectedBean) return;
           
           let packageNumber = +selectedBean.match(/(\d+)\./g)[0] - 1;

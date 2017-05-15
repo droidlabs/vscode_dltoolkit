@@ -30,7 +30,7 @@ module.exports = function goToSpecHandler() {
         return vscode.window.showTextDocument(textDocument);
       });
     } else {
-      vscode.window.showErrorMessage('Error. No file with tested class!'); 
+      vscode.window.showErrorMessage('No class found for current spec. Was it moved?'); 
     }
 
     return;
@@ -55,7 +55,7 @@ module.exports = function goToSpecHandler() {
     if      (existingSpecFile.length == 1) return goFromPackageToSpec(existingSpecFile[0]);
     else if (existingSpecFile.length >  1) return goFromPackageToSpecFolder(existingSpecFile);
     else if (existingSpecFile.length == 0) return goFromPackageToNewSpecFile(fullSpecFile, className);
-    else return vscode.window.showWarningMessage('File does not belong to any RDM Package!'); 
+    else return vscode.window.showWarningMessage('File does not belong to any package'); 
   }
 }
 
@@ -71,7 +71,7 @@ function goFromPackageToSpecFolder(MultipleSpecFile) {
   if (process.env.NODE_ENV == "test") return specNames;
 
   vscode.window.showQuickPick(specNames, { 
-    placeHolder: 'Pick rspec file to show:'
+    placeHolder: 'Select spec file:'
   }).then((selection) => {
     if (!selection) return;
 
@@ -87,7 +87,7 @@ function goFromPackageToNewSpecFile(fullSpecFile, className) {
   if (process.env.NODE_ENV == "test") return createNewSpecFile(fullSpecFile, className);
 
   vscode.window.showQuickPick(['Yes', 'No'], { 
-    placeHolder: 'Rspec file for this class does not exist. Create one?'
+    placeHolder: 'Spec file was not found. Do you want to create new one?'
   }).then((selection) => { 
     if (selection == 'Yes') {
       return createNewSpecFile(fullSpecFile, className);

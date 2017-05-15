@@ -2,7 +2,7 @@ const vscode       = require('vscode');
 const path         = require('path');
 const PackageUtils = require('../utils/package_utils');
 
-const NewFolderForPackage = "Новая папка";
+const NewFolderForPackage = "New folder";
 
 module.exports = class GeneratePackageHandler {
   constructor (namePicker, folderPicker, newFolderPicker) { 
@@ -14,14 +14,14 @@ module.exports = class GeneratePackageHandler {
   }
 
   handle() {
-    return this.namePicker("Enter package name:").then(selectedName => {
+    return this.namePicker("Type package name:").then(selectedName => {
       if (!selectedName) return;
 
-      return this.folderPicker(this.packageLocationFolders(), "Enter package folder:").then(selectedFolder => {
+      return this.folderPicker(this.packageLocationFolders(), "Type package folder:").then(selectedFolder => {
         switch (selectedFolder) {
           case NewFolderForPackage: 
             return this
-              .newFolderPicker("New folder path from project rootPath")
+              .newFolderPicker("Select folder")
               .then(result => this.RdmCreatePackage(selectedName, result));
           case undefined:
             return;

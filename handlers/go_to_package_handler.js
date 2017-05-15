@@ -14,12 +14,12 @@ module.exports = class GoToPackageHandler {
 
   handler() {
     const packageList = PackageUtils.getRdmPackagesList(vscode.workspace.rootPath).map(pkg => pkg.humanName())
-    return this.packageQuickPicker(packageList, "Enter package name:").then(selectedPackage => {
+    return this.packageQuickPicker(packageList, "Type package name:").then(selectedPackage => {
       if (!selectedPackage) return;
       
       const packageDirectory = PackageUtils.getRdmPackagesList(vscode.workspace.rootPath).find(item => item.humanName() == selectedPackage).pathToPackage;
       const filesList        = FileUtils.getFilesListForDirectory(packageDirectory).map(item => path.relative(packageDirectory, item))
-      return this.fileQuickPicker(filesList, "Enter file name:").then(selectedFile => {
+      return this.fileQuickPicker(filesList, "Type file name:").then(selectedFile => {
         if (!selectedFile) return this.handler();
 
           const fullPickedFile = path.join(packageDirectory, selectedFile);

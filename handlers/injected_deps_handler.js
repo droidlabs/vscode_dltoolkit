@@ -6,7 +6,7 @@ function commandHandler() {
   const Editor = vscode.window.activeTextEditor;
 
   if (!Editor) {
-    vscode.window.showErrorMessage('No opened files to find empty beans');
+    vscode.window.showErrorMessage('No opened files found');
     return; 
   }
 
@@ -16,7 +16,7 @@ function commandHandler() {
     return applyDeletions(BeansData.stringsToDelete, Editor.document.uri);
   } else {
     vscode.window.showQuickPick(['Yes', 'No'], { 
-      placeHolder: 'Do you want to delete duplicate dependency declarations and unused dependencies?'
+      placeHolder: 'Do you want to delete duplicate or unused dependencies?'
     }).then((selection) => { 
       if (selection == 'Yes') {
         applyDeletions(BeansData.stringsToDelete, Editor.document.uri);
@@ -33,13 +33,13 @@ function onSaveHandler(document) {
     
     if (checkBeansData.duplicatedBeans.length > 0) {
         vscode.window.showWarningMessage(
-            "Duplicate dependency declarations found: " + checkBeansData.duplicatedBeans.join(", ")
+            "Duplicate dependencies found: " + checkBeansData.duplicatedBeans.join(", ")
         );
     }
 
     if (checkBeansData.unusedBeans.length > 0) {
         vscode.window.showWarningMessage(
-            "Unused dependency declarations found: " + checkBeansData.unusedBeans.join(", ")
+            "Unused dependencies found: " + checkBeansData.unusedBeans.join(", ")
         );
     }
 }
