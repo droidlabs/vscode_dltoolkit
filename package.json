@@ -1,10 +1,10 @@
 {
-    "name": "droidlabs-toolkit",
-    "displayName": "DroidLabs Toolkit",
+    "name": "vscode-dltookit",
+    "displayName": "Vscode-DLTookit",
     "description": "",
-    "version": "0.0.30",
+    "version": "1.0.0",
     "icon": "images/droidlabs.jpg",
-    "publisher": "vocrsz",
+    "publisher": "droidlabs",
     "engines": {
         "vscode": "^1.10.0"
     },
