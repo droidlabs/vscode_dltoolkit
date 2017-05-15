@@ -14,7 +14,7 @@ module.exports = class FindBeanUsageHandler {
       .listInFile(vscode.window.activeTextEditor.document.uri.path)
       .then(fileData => {
         const beanData = fileData.find(item => item.type == "bean");
-        if (!beanData) throw new Error("There is no beans defined at file");
+        if (!beanData) throw new Error("There are no beans defined in file");
 
         const groupedByPackage      = Locate.findGroupedByPackage(beanData.name, ['inject']);
         const groupedForQuickPicker = Locate.findForQuickPick(beanData.name, ['inject']);

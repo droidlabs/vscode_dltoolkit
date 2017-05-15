@@ -58,7 +58,7 @@ module.exports = class PackageObject {
   //    ex: 'cache_system'
   _extractName() {
     if (!fs.existsSync(this.pathToPackageFile())) {
-      throw new Error("Package.rb not found");
+      throw new Error("Package.rb was not found");
     }
 
     const PackageNameRegex = new RegExp("package\\s+do.*?name\\s+['\"]([^'\"]+)['\"].*?end", "i");

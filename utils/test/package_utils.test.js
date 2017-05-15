@@ -43,7 +43,7 @@ describe("class PackageUtils", () => {
     it("throws error if Rdm.packages was not found before system root was reached", () => {
       expect(
         () => { PackageUtils.getRdmRootFile(__dirname) }
-      ).to.throw(Error, "Rdm.packages did not found at any folder. Type 'rdm init' to create it!");
+      ).to.throw(Error, "Rdm.packages was not found. Run 'rdm init' for initial setup");
     });
   });
 

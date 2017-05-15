@@ -1,10 +1,10 @@
 {
     "name": "vscode-dltookit",
-    "displayName": "Vscode-DLTookit",
+    "displayName": "DLTookit",
     "description": "",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "icon": "images/droidlabs.jpg",
-    "publisher": "droidlabs",
+    "publisher": "droid-labs-llc",
     "engines": {
         "vscode": "^1.10.0"
     },

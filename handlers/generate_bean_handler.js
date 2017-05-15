@@ -46,7 +46,7 @@ module.exports = class GenerateBeanHandler {
           return this.pickBeanPackage();
 
         default:
-          throw new Error('You do not pick current package. Bean Creation Process was breaked!');
+          throw new Error('Package was not selected. Bean Creation Process was aborted!');
       }
     });
   }
@@ -55,11 +55,11 @@ module.exports = class GenerateBeanHandler {
     const PackageCollection = PackageUtils.getRdmPackagesList(vscode.workspace.rootPath).map(item => item.humanName());
     
     return this.packagePicker(PackageCollection, "Enter Package Name:").then(result => {
-      if (!result) throw new Error('Create New Bean proccess was cancelled');
+      if (!result) throw new Error('Bean creation process was cancelled');
       
       const PickedPackage = PackageUtils.getRdmPackagesList(vscode.workspace.rootPath).find(item => item.humanName() == result);
 
-      if (!PickedPackage) throw new Error('Package does not exists');
+      if (!PickedPackage) throw new Error('Package does not exist');
       return Promise.resolve(PickedPackage);
     });
   }
@@ -71,7 +71,7 @@ module.exports = class GenerateBeanHandler {
       .map(item =>  path.relative(packageDirectory, item) );
     
     return this.folderPicker(packageFoldersList, 'Choose folder to create Bean').then(folder => {
-      if (!folder) { throw new Error('You do not pick folder name. Bean Creation Process was breaked!'); }
+      if (!folder) { throw new Error('Folder was not selected. Bean Creation Process was aborted!'); }
       
       return path.join(packageDirectory, folder);
     });
@@ -79,7 +79,7 @@ module.exports = class GenerateBeanHandler {
 
   pickBeanName(folder) {
     return this.beanNamePicker('Choose folder to create Bean').then(name => {
-      if (!name) { throw new Error('You do not pick bean name. Bean Creation Process was breaked!'); }
+      if (!name) { throw new Error('Bean name was not selected. Bean Creation Process was aborted!'); }
       
       return path.join(folder, GenerateBeanHandler.Rubyfy(name))
     });

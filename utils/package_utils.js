@@ -15,7 +15,7 @@ module.exports = class PackageUtils {
 
     let parentDir = path.resolve(root, '../');
     if (root == parentDir) {
-      throw new Error("Rdm.packages did not found at any folder. Type 'rdm init' to create it!");
+      throw new Error("Rdm.packages was not found. Run 'rdm init' for initial setup");
     }
 
     return PackageUtils.getRdmRootFile(parentDir);
