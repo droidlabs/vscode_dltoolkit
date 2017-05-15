@@ -10,6 +10,16 @@ module.exports = class VscodeUtils {
       return Promise.resolve(selectedOption)
     }
   }
+
+  static showInputBox(placeHolder) {
+    return vscode.window.showInputBox({placeHolder: placeHolder})
+  }
+
+  static showInputBoxTest(inputValue) {
+    return function(placeHolder) {
+      return Promise.resolve(inputValue);
+    }
+  }
 }
 
 

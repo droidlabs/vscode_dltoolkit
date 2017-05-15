@@ -21,7 +21,7 @@ describe("#showAllBeansHandler", () => {
       .then(() => {
         return assert.equal(
           vscode.window.activeTextEditor.document.uri.path, 
-          path.join(__dirname, 'fixtures', 'cache_system', 'package', 'multispec_cache_system.rb')
+          path.join(__dirname, 'fixtures', 'cache_system', 'package', 'cache_system', 'multispec_cache_system.rb')
         )
       });
   });

@@ -47,4 +47,18 @@ module.exports = class FileUtils {
         }
     }
   }
+
+  static rimraf(dir_path) {
+    if (fs.existsSync(dir_path)) {
+      fs.readdirSync(dir_path).forEach(function(entry) {
+        var entry_path = path.join(dir_path, entry);
+        if (fs.lstatSync(entry_path).isDirectory()) {
+          FileUtils.rimraf(entry_path);
+        } else {
+          fs.unlinkSync(entry_path);
+        }
+      });
+      fs.rmdirSync(dir_path);
+    }
+  }
 }

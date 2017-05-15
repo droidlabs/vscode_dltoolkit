@@ -25,7 +25,7 @@ describe("#goToSpecHandler", () => {
 
   describe("from described class to spec file if exists", () => {
     describe("if folder exists", () => {
-      const FileWithMultipleSpecsPath = path.join(__dirname, 'fixtures', 'cache_system', 'package', 'multispec_cache_system.rb');
+      const FileWithMultipleSpecsPath = path.join(__dirname, 'fixtures', 'cache_system', 'package', 'cache_system', 'multispec_cache_system.rb');
 
       it("returns list of file at folder", () => {
         return vscode.workspace.openTextDocument(FileWithMultipleSpecsPath).then((doc) => {
@@ -61,8 +61,8 @@ describe("#goToSpecHandler", () => {
   });
 
   describe("from described class to spec file if not exists", () => {
-    const NewSpecForFilePath  = path.join(__dirname, 'fixtures', 'cache_system', 'spec', 'no_spec_cache_system_spec.rb');
-    const FileWithoutSpecPath = path.join(__dirname, 'fixtures', 'cache_system', 'package', 'no_spec_cache_system.rb')
+    const NewSpecForFilePath  = path.join(__dirname, 'fixtures', 'cache_system', 'spec', 'cache_system', 'no_spec_cache_system_spec.rb');
+    const FileWithoutSpecPath = path.join(__dirname, 'fixtures', 'cache_system', 'package', 'cache_system', 'no_spec_cache_system.rb')
 
     after(() => { fs.unlinkSync(NewSpecForFilePath) });
 

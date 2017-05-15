@@ -25,7 +25,7 @@ module.exports = class PackageUtils {
   // @return [ArrayOf(PackageObject)], ex: [new PackageObject(), new PackageObject()]
   static getRdmPackagesList(root) {
     const RdmPackageDefifitionRegex = new RegExp("\\s*package\\s*\'([\\w\/]+)\'", "i");
-    
+      
     return fs.readFileSync(PackageUtils.getRdmRootFile(root))
       .toString()
       .split("\n")

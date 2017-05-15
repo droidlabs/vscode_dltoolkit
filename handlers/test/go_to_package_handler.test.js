@@ -9,11 +9,11 @@ describe("#goToPackageHandler", () => {
   it("ask to choose package and file inside package and go to this file", () => {
     return new GoToPackageHandler(
       VscodeUtils.showQuickPickTest("CacheSystem"), 
-      VscodeUtils.showQuickPickTest("package/multispec_cache_system.rb")
+      VscodeUtils.showQuickPickTest("package/cache_system/multispec_cache_system.rb")
     )().then(() => {
       return assert.equal(
         vscode.window.activeTextEditor.document.uri.path,
-        path.join(__dirname, 'fixtures', 'cache_system', 'package', 'multispec_cache_system.rb')
+        path.join(__dirname, 'fixtures', 'cache_system', 'package', 'cache_system', 'multispec_cache_system.rb')
       )
     });
   });

@@ -6,12 +6,13 @@ const provideDefinition = require('./handlers/bean_provider_definition');
 const ShowAllBeansCommand  = require('./handlers/show_all_beans_handler');
 const FindBeanUsageHandler = require('./handlers/find_bean_usage_handler');
 
-const GoToPackageCommand     = require('./handlers/go_to_package_handler');
-const GeneratePackageCommand = require('./handlers/generatePackageCommand');
-const GenerateBeanCommand    = require('./handlers/generateBeanCommand');
+const GoToPackageHandler     = require('./handlers/go_to_package_handler');
+const GeneratePackageHandler = require('./handlers/generate_package_handler');
+const GenerateBeanHandler    = require('./handlers/generate_bean_handler');
 
 const StatusBarHandler    = require('./handlers/status_bar_handler');
 const InjectedDepsHandler = require('./handlers/injected_deps_handler');
+
 const GoToSpecHandler     = require('./handlers/go_to_spec_handler');
 
 function activate(context) {
@@ -22,9 +23,9 @@ function activate(context) {
 
         vscode.commands.registerCommand('extension.findBeanUsage',              new FindBeanUsageHandler(VscodeUtils.showQuickPick)),  
         vscode.commands.registerCommand('extension.showAllBeans',               new ShowAllBeansCommand(VscodeUtils.showQuickPick)),   
-        vscode.commands.registerCommand('extension.goToPackage',                new GoToPackageCommand(VscodeUtils.showQuickPick, VscodeUtils.showQuickPick)),    
-        vscode.commands.registerCommand('extension.generateNewPackage',         new GeneratePackageCommand()),
-        vscode.commands.registerCommand('extension.generateNewBean',            new GenerateBeanCommand()),
+        vscode.commands.registerCommand('extension.goToPackage',                new GoToPackageHandler(VscodeUtils.showQuickPick, VscodeUtils.showQuickPick)),    
+        vscode.commands.registerCommand('extension.generateNewPackage',         new GeneratePackageHandler(VscodeUtils.showInputBox, VscodeUtils.showQuickPick, VscodeUtils.showInputBox)),
+        vscode.commands.registerCommand('extension.generateNewBean',            new GenerateBeanHandler(VscodeUtils.showQuickPick, VscodeUtils.showQuickPick, VscodeUtils.showQuickPick, VscodeUtils.showInputBox)),
         vscode.commands.registerCommand('extension.removeUnusedInjectedDeps',   InjectedDepsHandler.commandHandler),
         vscode.commands.registerCommand('extension.showSpec',                   GoToSpecHandler),
 

@@ -7,7 +7,7 @@ const FindBeanUsageHandler = require('../find_bean_usage_handler');
 
 describe("#findBeanUsageHandler", () => {
   it("goes to package if picked", () => {
-    const FileWithInjectedDependencies = path.join(__dirname, 'fixtures', 'project', 'package', 'project_repository.rb');
+    const FileWithInjectedDependencies = path.join(__dirname, 'fixtures', 'project', 'package', 'project', 'project_repository.rb');
 
     return vscode.workspace.openTextDocument(FileWithInjectedDependencies).then((doc) => {
       return vscode.window.showTextDocument(doc).then(() => {
@@ -23,7 +23,7 @@ describe("#findBeanUsageHandler", () => {
   });
 
   it("goes to bean if picked", () => {
-    const FileWithInjectedDependencies = path.join(__dirname, 'fixtures', 'project', 'package', 'project_repository.rb');
+    const FileWithInjectedDependencies = path.join(__dirname, 'fixtures', 'project', 'package', 'project', 'project_repository.rb');
 
     return vscode.workspace.openTextDocument(FileWithInjectedDependencies).then((doc) => {
       return vscode.window.showTextDocument(doc).then(() => {
@@ -31,7 +31,7 @@ describe("#findBeanUsageHandler", () => {
           .then(() => {
             return assert.equal(
               vscode.window.activeTextEditor.document.uri.path, 
-              path.join(__dirname, 'fixtures', 'cache_system', 'package', 'multispec_cache_system.rb')
+              path.join(__dirname, 'fixtures', 'cache_system', 'package', 'cache_system', 'multispec_cache_system.rb')
             )
           });
       });

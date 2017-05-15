@@ -5,3 +5,5 @@ require('../handlers/test/go_to_spec_handler.test');
 require('../handlers/test/find_bean_usage_handler.test');
 require('../handlers/test/show_all_beans_handler.test');
 require('../handlers/test/go_to_package_handler.test');
+require('../handlers/test/generate_bean_handler.test');
+require('../handlers/test/generate_package_handler.test');

@@ -39,7 +39,7 @@ describe("#provideDefinition", function() {
   it("with proper definition file uri", () => {
     assert.equal(
       result[0]["uri"]["path"], 
-      path.join(__dirname, 'fixtures', 'project', 'package', 'project_creator.rb')
+      path.join(__dirname, 'fixtures', 'project', 'package', 'project', 'project_creator.rb')
     );
   });
 });
