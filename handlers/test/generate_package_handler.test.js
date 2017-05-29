@@ -53,7 +53,7 @@ describe("#generateNewPackage", () =>{
     it("asks package name and new folder path, creates folder, package in folder and goes to Package.rb", () => {
       return new GeneratePackageHandler(
         VscodeUtils.showInputBoxTest("entities"),
-        VscodeUtils.showQuickPickTest("Новая папка"),
+        VscodeUtils.showQuickPickTest("New folder"),
         VscodeUtils.showInputBoxTest("/core/domain/")
       )().then(() => {
         return assert.equal(

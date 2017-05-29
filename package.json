@@ -2,7 +2,7 @@
     "name": "vscode-dltookit",
     "displayName": "DLTookit",
     "description": "",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "icon": "images/droidlabs.jpg",
     "publisher": "droid-labs-llc",
     "engines": {

@@ -36,7 +36,7 @@ module.exports = class GeneratePackageHandler {
   // 'projects'             => ''
   packageLocationFolders() {
     let result = PackageUtils.getRdmPackagesList(vscode.workspace.rootPath).map(pkg => {
-      let result = pkg.name.split('/').slice(0, -1).join('/');
+      let result = path.dirname(path.relative(vscode.workspace.rootPath, pkg.location()))
       return result ? result : "./";
     });
 

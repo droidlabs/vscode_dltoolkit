@@ -110,11 +110,11 @@ function createNewSpecFile(fullSpecFile, className) {
 function contentForSpecFile(describedClass) {
   const content = 
 `describe ${describedClass} do
-before :all do
-end
+  before :all do
+  end
 
-it {
-}
+  it {
+  }
 end`
 
   return content;

@@ -37,7 +37,7 @@ module.exports = class FileUtils {
   }
 
   static getClassName(document) {
-    let defineClassRegex = /class ([a-zA-Z:]+)/i
+    let defineClassRegex = /class ([\w\d:]+)/i
 
     for (let i=0;i<document.lineCount;i++) {
         let line = document.lineAt(i).text;
