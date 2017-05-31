@@ -32,6 +32,9 @@ function activate(context) {
         vscode.window.onDidChangeActiveTextEditor(StatusBarHandler.setPackageNameInStatusBar),
         vscode.workspace.onDidOpenTextDocument(StatusBarHandler.setPackageNameInStatusBar),
 
+        vscode.window.onDidChangeActiveTextEditor(StatusBarHandler.checkSpecExistance),
+        vscode.workspace.onDidOpenTextDocument(StatusBarHandler.checkSpecExistance),
+
         vscode.workspace.onDidSaveTextDocument(InjectedDepsHandler.onSaveHandler)
     );
 }

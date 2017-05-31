@@ -35,26 +35,11 @@ module.exports = function goToSpecHandler() {
 
     return;
   } else if (~currentFileName.indexOf('package/')) {
-    let packageFolder   = currentFileName.split('/package/')[0]
-    let fullSpecFile    = currentFileName.replace('package/', 'spec/').replace('.rb', '_spec.rb');
-    let packageSpecFile = currentFileName.split('/package/')[1]
-    let specFile        = path.basename(fullSpecFile);
-    let specFolder      = specFile.replace('_spec.rb', '');
-
-    let className       = FileUtils.getClassName(DOCUMENT) || StringUtils.classify(packageSpecFile)
-
-    let filesList         = FileUtils.getFilesListForDirectory(path.join(packageFolder, '/spec'));
-    let existingSpecFile  = filesList.filter((item) => { return fullSpecFile == item; });
+    let existingSpecFiles = FileUtils.findSpecFiles(currentFileName);
     
-    if (!existingSpecFile.length) {
-        existingSpecFile = filesList.filter((item) => { 
-            return item.split('/').slice(-2, -1) == specFolder; 
-        });
-    }      
-
-    if      (existingSpecFile.length == 1) return goFromPackageToSpec(existingSpecFile[0]);
-    else if (existingSpecFile.length >  1) return goFromPackageToSpecFolder(existingSpecFile);
-    else if (existingSpecFile.length == 0) return goFromPackageToNewSpecFile(fullSpecFile, className);
+    if      (existingSpecFiles.length == 1) return goFromPackageToSpec(existingSpecFiles[0]);
+    else if (existingSpecFiles.length >  1) return goFromPackageToSpecFolder(existingSpecFiles);
+    else if (existingSpecFiles.length == 0) return goFromPackageToNewSpecFile(currentFileName);
     else return vscode.window.showWarningMessage('File does not belong to any package'); 
   }
 }
@@ -83,7 +68,11 @@ function goFromPackageToSpecFolder(MultipleSpecFile) {
   });
 }
 
-function goFromPackageToNewSpecFile(fullSpecFile, className) {
+function goFromPackageToNewSpecFile(currentFile) {      
+  let packageSpecFile = currentFile.split('/package/')[1]
+  let className       = FileUtils.getClassName(vscode.window.activeTextEditor.document) || StringUtils.classify(packageSpecFile)
+  let fullSpecFile    = currentFile.replace('package/', 'spec/').replace('.rb', '_spec.rb');
+
   if (process.env.NODE_ENV == "test") return createNewSpecFile(fullSpecFile, className);
 
   vscode.window.showQuickPick(['Yes', 'No'], { 

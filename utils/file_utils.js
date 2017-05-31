@@ -2,6 +2,20 @@ const fs    = require('fs');
 const path  = require('path');
 
 module.exports = class FileUtils {
+  static findSpecFiles(filePath) {
+    if (!~filePath.indexOf('/package/')) return undefined;
+    let packageFolder = filePath.split('/package/')[0];
+    let fullSpecFile  = filePath.replace('package/', 'spec/').replace('.rb', '_spec.rb');
+    let specFile      = path.basename(fullSpecFile);
+    let specFolder    = specFile.replace('_spec.rb', '');
+
+    let filesList         = FileUtils.getFilesListForDirectory(path.join(packageFolder, '/spec'));
+    let existingSpecFile  = filesList.filter((item) => { return fullSpecFile == item; });
+    
+    if (existingSpecFile.length) return existingSpecFile;
+    else return filesList.filter(item => item.split('/').slice(-2, -1) == specFolder );
+  }
+
   static getFilesListForDirectory(dir) {
     var results = [];
     var list = fs.readdirSync(dir);
