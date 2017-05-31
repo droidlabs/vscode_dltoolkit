@@ -4,7 +4,7 @@ const PackageUtils  = require('../utils/package_utils');
 const FileUtils     = require('../utils/file_utils');
 
 const PACKAGE_NAME_PRIORITY   = 100;
-const SPEC_EXISTANCE_PRIORITY = 110;
+const SPEC_EXISTANCE_PRIORITY = 90;
 const statusBar               = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, PACKAGE_NAME_PRIORITY);
 const specStatusBar           = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, SPEC_EXISTANCE_PRIORITY);
 
@@ -22,7 +22,7 @@ function setPackageNameInStatusBar(document) {
 
 function checkSpecExistance(document) {
   let specFiles = FileUtils.findSpecFiles(document.fileName.replace('.git', ''));
-  console.log(specFiles);
+
   if (specFiles === undefined) {
     specStatusBar.text = '';
     specStatusBar.hide();
@@ -30,10 +30,12 @@ function checkSpecExistance(document) {
   }
 
   if (specFiles.length) {
-    specStatusBar.text = `${specFiles.length} rspec files was found`;
+    specStatusBar.text = specFiles.length > 1 ? 
+      `${specFiles.length} rspec files were found` : 
+      `${specFiles.length} rspec file was found`;
     specStatusBar.show();
   } else {
-    specStatusBar.text = 'No rspec files was found';
+    specStatusBar.text = '';
     specStatusBar.show();
   }
 }
