@@ -2,7 +2,7 @@
     "name": "vscode-dltookit",
     "displayName": "DLTookit",
     "description": "",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "icon": "images/droidlabs.jpg",
     "publisher": "droid-labs-llc",
     "engines": {
@@ -57,31 +57,31 @@
         "commands": [
             {
                 "command": "extension.showSpec",
-                "title": "Files: Show Spec File"
+                "title": "DLToolkit: Show Spec File"
             },
             {
                 "command": "extension.removeUnusedInjectedDeps",
-                "title": "Files: Check Empty Inject"
+                "title": "DLToolkit: Check Empty Inject"
             },
             {
                 "command": "extension.goToPackage",
-                "title": "Files: Go to RDM Package Folder"
+                "title": "DLToolkit: Go to RDM Package Folder"
             },
             {
                 "command": "extension.findBeanUsage",
-                "title": "Files: Show bean usage"
+                "title": "DLToolkit: Show bean usage"
             },
             {
                 "command": "extension.showAllBeans",
-                "title": "Files: Show all beans in project"
+                "title": "DLToolkit: Show all beans in project"
             },
             {
                 "command": "extension.generateNewPackage",
-                "title": "Files: Generate new Rdm package"
+                "title": "DLToolkit: Generate new Rdm package"
             },
             {
                 "command": "extension.generateNewBean",
-                "title": "Files: Generate new Rdm Bean"
+                "title": "DLToolkit: Generate new Rdm Bean"
             }
         ],
         "keybindings": [
